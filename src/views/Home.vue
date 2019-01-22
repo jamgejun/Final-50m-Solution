@@ -24,7 +24,7 @@
 			<aside :class="collapsed?'menu-collapsed':'menu-expanded'">
 				<!--导航菜单-->
 				<el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleopen" @close="handleclose" @select="handleselect"
-					 unique-opened router v-show="!collapsed">
+					 unique-opened router v-show="!collapsed" style="width: 200px; overflow: hidden;">
 					<template v-for="(item,index) in $router.options.routes" v-if="hanleLevel(item)">
 						<el-submenu :index="index+''" v-if="!item.leaf">
 							<template slot="title"><i :class="item.iconCls"></i>{{item.name}}</template>
@@ -35,7 +35,7 @@
 				</el-menu>
 				<!--导航菜单-折叠后-->
 				<ul class="el-menu el-menu-vertical-demo collapsed" v-show="collapsed" ref="menuCollapsed">
-					<li v-for="(item,index) in $router.options.routes" v-if="!item.hidden" class="el-submenu item">
+					<li v-for="(item,index) in $router.options.routes" v-if="hanleLevel(item)" class="el-submenu item">
 						<template v-if="!item.leaf">
 							<div class="el-submenu__title" style="padding-left: 20px;" @mouseover="showMenu(index,true)" @mouseout="showMenu(index,false)"><i :class="item.iconCls"></i></div>
 							<ul class="el-menu submenu" :class="'submenu-hook-'+index" @mouseover="showMenu(index,true)" @mouseout="showMenu(index,false)"> 
@@ -154,9 +154,9 @@
 		bottom: 0px;
 		width: 100%;
 		.header {
-			height: 60px;
-			line-height: 60px;
-			background: $color-primary;
+			height: 70px;
+			line-height: 70px;
+			background: #2f333e;
 			color:#fff;
 			.userinfo {
 				text-align: right;
@@ -176,8 +176,8 @@
 			}
 			.logo {
 				//width:230px;
-				height:60px;
-				font-size: 22px;
+				height:70px;
+				font-size: 18px;
 				padding-left:20px;
 				padding-right:20px;
 				border-color: rgba(238,241,146,0.3);
@@ -193,7 +193,7 @@
 				}
 			}
 			.logo-width{
-				width:230px;
+				width:200px;
 			}
 			.logo-collapse-width{
 				width:60px
@@ -201,8 +201,8 @@
 			.tools{
 				padding: 0px 23px;
 				width:14px;
-				height: 60px;
-				line-height: 60px;
+				height: 70px;
+				line-height: 70px;
 				cursor: pointer;
 			}
 		}
@@ -210,12 +210,12 @@
 			display: flex;
 			// background: #324057;
 			position: absolute;
-			top: 60px;
+			top: 70px;
 			bottom: 0px;
 			overflow: hidden;
 			aside {
-				flex:0 0 230px;
-				width: 230px;
+				flex:0 0 200px;
+				width: 200px;
 				// position: absolute;
 				// top: 0px;
 				// bottom: 0px;
@@ -243,8 +243,8 @@
 				width: 60px;
 			}
 			.menu-expanded{
-				flex:0 0 230px;
-				width: 230px;
+				flex:0 0 200px;
+				width: 200px;
 			}
 			.content-container {
 				// background: #f1f2f7;
