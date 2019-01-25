@@ -1,15 +1,22 @@
 <template>
-    <div>
-        商品列表
-    </div>
+    <section>
+        <el-table :data="goodsList">
+
+        </el-table>
+    </section>
 </template>
 
 <script>
-export default {
-
-}
+    import { getGoods, removeGoods, changeGoods , addGoods } from '../../api'
+	export default {
+        data () {
+            return {
+                goodsList: []
+            }
+        }
+    }
 </script>
 
-<style>
-
+<style lang='scss'>
+	
 </style>
