@@ -16,7 +16,7 @@ import store from './vuex/store'
 import Vuex from 'vuex'
 //import NProgress from 'nprogress'
 //import 'nprogress/nprogress.css'
-import routes from './router/index'
+import routes from './router/noAuthority'
 import Mock from './mock'
 Mock.bootstrap();
 
@@ -32,7 +32,6 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  //NProgress.start();
   if (to.path == '/login') {
     sessionStorage.removeItem('user');
   }

@@ -3,14 +3,17 @@
 		<transition name="fade"
 		            mode="out-in">
 			<router-view></router-view>
+			<!-- <Home></Home> -->
 		</transition>
 	</div>
 </template>
 
 <script>
+import Home from './views/Home.vue'
 export default {
 	name: 'app',
 	components: {
+		Home
 	}
 }
 

@@ -116,10 +116,7 @@
 					sessionStorage.removeItem('user');
 					_this.$router.push('/login');
 				}).catch(() => {
-
 				});
-
-
 			},
 			//折叠导航栏
 			collapse:function(){
@@ -131,7 +128,6 @@
 		},
 		mounted() {
 			var user = sessionStorage.getItem('user');
-
 			if (user) {
 				user = JSON.parse(user);
 				console.log(user);
@@ -139,10 +135,8 @@
 				this.sysUserAvatar = user.avatar || '';
 				this.sysUserLevel = user.id;
 			}
-
 		}
 	}
-
 </script>
 
 <style scoped lang="scss">
@@ -235,7 +229,6 @@
 						height:auto;
 						display:none;
 					}
-
 				}
 			}
 			.menu-collapsed{

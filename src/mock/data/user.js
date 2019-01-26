@@ -9,7 +9,7 @@ const LoginUsers = [
   },
   {
     id: 2,
-    username: 'reposity',
+    username: 'repository',
     password: '123456',
     avatar: 'https://raw.githubusercontent.com/taylorchen709/markdown-images/master/vueadmin/user.png',
     name: '仓库管理员'
