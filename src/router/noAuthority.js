@@ -52,6 +52,7 @@ let routes = [
             {
                 path: '/goodsMessage',
                 component: (resolve) => require(['@/views/shop/goods/goodsMessage'], resolve), 
+                name: '商品信息'
             }
         ]
     },
