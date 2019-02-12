@@ -8,8 +8,8 @@
                 </el-form-item>
                 <el-form-item label="">
                     <el-select v-model="buildingStatus.status" placeholder="选择楼栋状态">
-                    <el-option label="正常" value="1"></el-option>
-                    <el-option label="停营" value="0"></el-option>
+                        <el-option label="正常" value="1"></el-option>
+                        <el-option label="停营" value="0"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -38,8 +38,8 @@
 			</el-table-column>
 			<el-table-column label="操作" min-width="180">
 				<template slot-scope="scope">
-					<el-button size="small" @click="handleMessage(scope.$index, scope.row)">查看详情</el-button>
-                    <el-button size="small" @click="handleStatus(scope.$index, scope.row)">{{ scope.row.status === 1 ? '停止运营' : '恢复运营' }}</el-button>
+					<el-button size="small" @click="handleMessage(scope.$index, scope.row)">修改</el-button>
+                    <el-button size="small" @click="handleStatus(scope.$index, scope.row)">{{ scope.row.status === 1 ? '暂停运营' : '恢复运营' }}</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
@@ -162,7 +162,7 @@
 		methods: {
             // 处理楼栋运营状态
             handleStatus(status) {
-                return status === 1 ? '正在运营' : '停运中'
+                return status === 1 ? '正常' : '停运'
             },
             selsChange() {
 
