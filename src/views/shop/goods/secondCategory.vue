@@ -4,7 +4,7 @@
         <el-col :span="24" class="toolbar">
             <el-form :inline="true" :model="GcSearch" class="demo-form-inline"> 
                 <el-form-item label="">
-                    <el-input v-model="GcSearch.name" placeholder="请输入一级分类名称"></el-input>
+                    <el-input v-model="GcSearch.name" placeholder="请输入二级分类名称"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="handleSeach">查询</el-button>
@@ -15,26 +15,20 @@
             </el-form>
         </el-col>
 
-        <el-table :data="GcList">
-            <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column prop="name" label="分类名" align="center" width="120"></el-table-column>
+        <el-table :data="SecondList">
+            <el-table-column type="selection" width="30"></el-table-column>
+            <el-table-column prop="name" label="分类名" align="center" width="100"></el-table-column>
             <el-table-column prop="index" width="120" label="显示顺序号" sorttable></el-table-column>
-            <el-table-column prop="status" label="显示状态" align="center" width="200">
-                <template slot-scope="scope">
-                    {{ handleStatus(scope.row.status) }}
-                </template>
-            </el-table-column>
-            <el-table-column prop="SecondLists" label="操作" min-width="200" align="center">
+            <el-table-column label="操作" min-width="120" align="center">
                 <template slot-scope="scope">
                     <el-button size="small" @click="handleChange(scope.$index, scope.row)">修改</el-button>
-                    <el-button size="small" @click="handleSecond(scope.$index, scope.row)">维护二级分类</el-button>
                     <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
 
         <!-- 新增分类 -->
-        <el-dialog title="新增分类" :visible.sync="GcLock.addCategory" :close-on-click-model="false">
+        <el-dialog title="新增分类" :visible.sync="GcLock.addCategory" :close-on-click-model="false" :modal="false" min-width="60vh">
             <el-form :data="addForm" label-width="100px" ref="addForm">
                 <el-form-item label="分类名">
                     <el-input v-model="addForm.name" auto-complete="off"></el-input>
@@ -49,13 +43,6 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="显示状态">
-                    <el-select v-model="addForm.status" placeholder="选择显示状态">
-                        <el-option label="关闭" value="0"></el-option>
-                        <el-option label="显示在首页" value="1"></el-option>
-                        <el-option label="显示在分页" value="2"></el-option>
-                    </el-select>
-                </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer" style="margin-top:20x;">
                 <el-button @click.native="GcLock.addCategory = false">取消</el-button>
@@ -64,7 +51,7 @@
         </el-dialog>
 
         <!-- 修改 -->
-        <el-dialog title="新增分类" :visible.sync="GcLock.change" :close-on-click-model="false">
+        <el-dialog title="新增分类" :visible.sync="GcLock.change" :close-on-click-model="false" :modal="false" min-width="60vh">
             <el-form :data="changeForm" label-width="100px" ref="changeForm">
                 <el-form-item label="分类名">
                     <el-input v-model="changeForm.name" auto-complete="off"></el-input>
@@ -79,23 +66,11 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="显示状态">
-                    <el-select v-model="changeForm.status" placeholder="选择显示状态">
-                        <el-option label="关闭" value="0"></el-option>
-                        <el-option label="显示在首页" value="1"></el-option>
-                        <el-option label="显示在分页" value="2"></el-option>
-                    </el-select>
-                </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer" style="margin-top:20x;">
                 <el-button @click.native="GcLock.change = false">取消</el-button>
                 <el-button type="primary" @click.native="changeSubmit">提交</el-button>
             </div>
-        </el-dialog>
-
-        <!-- 二级列表 -->
-        <el-dialog title="二级列表" :visible.sync="GcLock.manageSecond" :close-on-click-model="false">
-            <secondCategory v-bind:SecondList="SecondLists" ></secondCategory>
         </el-dialog>
     </section>
 </template>
@@ -103,8 +78,11 @@
 <script>
 import secondCategory from "./secondCategory.vue"
 export default {
-    components: {
-        secondCategory
+    props: {
+        SecondList: {
+            type: Array,
+            required: true
+        }
     },
     data() {
         return {
@@ -150,74 +128,23 @@ export default {
                 {
                     name: '零食',
                     index: 5,
-                    status: 0,
-                    SecondLists: [
-                        {
-                            name: '小吃类',
-                            index: 1
-                        },
-                        {
-                            name: '辣条类',
-                            index: 2
-                        },
-                        {
-                            name: '水果类',
-                            index: 3
-                        },
-                    ]
+                    status: 0
                 },
                 {
                     name: '果蔬',
                     index: 4,
-                    status: 2,
-                    SecondLists: [
-                        {
-                            name: '辣条类',
-                            index: 2
-                        },
-                        {
-                            name: '水果类',
-                            index: 3
-                        },
-                    ]
+                    status: 2
                 },
                 {
                     name: '生鲜',
                     index: 3,
-                    status: 1,
-                    SecondLists: [
-                        {
-                            name: '小吃类',
-                            index: 1
-                        },
-                        {
-                            name: '辣条类',
-                            index: 2
-                        }
-                    ]
+                    status: 1
                 },
                 {
                     name: '零食',
                     index: 2,
-                    status: 1,
-                    SecondLists: [
-                        {
-                            name: '小吃类',
-                            index: 1
-                        },
-                        {
-                            name: '辣条类',
-                            index: 2
-                        },
-                        {
-                            name: '水果类',
-                            index: 3
-                        },
-                    ]
-                }
-            ],
-            SecondLists: [
-                
+                    status: 1
+                },
             ]
         }
     },
@@ -253,10 +180,8 @@ export default {
             _this.changeForm.status = _this.handleStatus(row.status);
         },
         handleSecond(index, row) {
-            console.log(row);
             let _this = this;
             _this.GcLock.manageSecond = !_this.GcLock.manageSecond;
-            _this.SecondLists = row.SecondLists;
         }
     }
 }
