@@ -58,12 +58,13 @@
                     <el-button size="small" :type="scope.row.workStatus === 1 ? 'warning' : 'success'" @click="handleworkStatus(scope.$index, scope.row)">
                         {{ scope.row.workStatus === 1 ? '下班' : '上班' }}
                     </el-button>
-                    <el-button size="small" type="primary"  @click="handleDel(scope.$index, scope.row)">修改</el-button>
+                    <el-button size="small" type="primary"  @click="handleChange(scope.$index, scope.row)">修改</el-button>
                     <el-button size="small" type="danger"  @click="handleDel(scope.$index, scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
 
+        <!-- 新增骑手 -->
         <el-dialog title="增加骑手" :visible.sync="RiderLock.add" :close-on-click-model="false" min-width="60vw">
             <el-form :model="addForm" ref="addForm" :inline="true">
                 <el-form-item prop="name" label="骑手姓名">
@@ -79,10 +80,80 @@
                 <el-form-item prop="phone" label="骑手电话">
                     <el-input type="number" v-model="addForm.phone"></el-input>
                 </el-form-item>
+                <el-form-item prop="serverBuilding" label="服务楼栋">
+                    <el-select v-model="addForm.serverBuilding"  placeholder="请选择骑手服务楼栋">
+                        <el-option 
+                            v-for="(item, index) in buildingList"
+                            :key="index"
+                            :value="item.name"
+                            :label="item.name"
+                            >
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item prop="isStaff" label="在职情况">
+                    <el-select v-model="addForm.isStaff" placeholder="选择是否在职">
+                        <el-option value="1" label="正常"></el-option>
+                        <el-option value="0" label="暂停"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item prop="workStatus" label="工作状态">
+                    <el-select v-model="addForm.workStatus" placeholder="选择工作状态">
+                        <el-option value="1" label="正常"></el-option>
+                        <el-option value="0" label="暂停"></el-option>
+                    </el-select>
+                </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer" style="margin-top:20x;">
                 <el-button @click.native="cancer('add', 'addForm')">取消</el-button>
-                <el-button type="primary" @click.native="changeSubmit">提交</el-button>
+                <el-button type="primary" @click.native="addSubmit('addForm')">提交</el-button>
+            </div>
+        </el-dialog>
+
+        <!-- 修改骑手 -->
+        <!-- 新增骑手 -->
+        <el-dialog title="增加骑手" :visible.sync="RiderLock.change" :close-on-click-model="false" min-width="60vw">
+            <el-form :model="changeForm" ref="changeForm" :inline="true">
+                <el-form-item prop="name" label="骑手姓名">
+                    <el-input v-model="changeForm.name"></el-input>
+                </el-form-item>
+                <el-form-item prop="jionTime" label="加入时间">
+                    <el-date-picker
+                        v-model="changeForm.jionTime"
+                        type="date"
+                        placeholder="选择日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item prop="phone" label="骑手电话">
+                    <el-input type="number" v-model="changeForm.phone"></el-input>
+                </el-form-item>
+                <el-form-item prop="serverBuilding" label="服务楼栋">
+                    <el-select v-model="changeForm.serverBuilding"  placeholder="请选择骑手服务楼栋">
+                        <el-option 
+                            v-for="(item, index) in buildingList"
+                            :key="index"
+                            :value="item.name"
+                            :label="item.name"
+                            >
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item prop="isStaff" label="在职情况">
+                    <el-select v-model="changeForm.isStaff" placeholder="选择是否在职">
+                        <el-option value="1" label="正常"></el-option>
+                        <el-option value="0" label="暂停"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item prop="workStatus" label="工作状态">
+                    <el-select v-model="changeForm.workStatus" placeholder="选择工作状态">
+                        <el-option value="1" label="正常"></el-option>
+                        <el-option value="0" label="暂停"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer" style="margin-top:20x;">
+                <el-button @click.native="cancer('change', 'changeForm')">取消</el-button>
+                <el-button type="primary" @click.native="changeSubmit('changeForm')">提交</el-button>
             </div>
         </el-dialog>
     </section>
@@ -127,8 +198,8 @@ export default {
                 name: '',
                 phone: '',
                 serverBuilding: '',
-                isStaff: 0,
-                workStatus: 0,
+                isStaff: '正常',
+                workStatus: '下班',
                 otherCommit: ''
             },
             changeForm: {
@@ -211,6 +282,38 @@ export default {
                     type: 'success'
                 });
             })
+        },
+        addSubmit(formName) {
+            let _this = this;
+            _this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    _this.$confirm('是否确认添加骑手?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        _this.RiderList.push(this.addForm);
+                        _this.$message({
+                            message: '操作成功',
+                            type: 'success'
+                        });
+                        _this.$refs[formName].resetFields();
+                    }).catch(() => {
+                        _this.$message({
+                            message: '已取消',
+                            type: 'success'
+                        });
+                    });
+                } else {
+                    console.log('error submit!!');
+                    return false;
+                };
+            })
+        },
+        handleChange (index, row) {
+            let _this = this;
+            _this.RiderLock.change = !_this.RiderLock.change;
+            _this.changeForm = row;
         }
     }
 }
