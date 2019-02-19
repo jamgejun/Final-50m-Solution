@@ -199,7 +199,7 @@ export default {
                 phone: '',
                 serverBuilding: '',
                 isStaff: '正常',
-                workStatus: '下班',
+                workStatus: '暂停',
                 otherCommit: ''
             },
             changeForm: {
