@@ -37,7 +37,7 @@
         </el-col>
         
         <!-- 列表 -->
-        <el-table :data="messageOrders" highlight-current-row v-loading="loading" style="width: 100%;">
+        <el-table :data="messageOrders" highlight-current-row  style="width: 100%;">
                 <el-table-column prop="number" label="订单编号" align="center" width="140" sortable>
                 </el-table-column>
 				<el-table-column prop="money" label="订单金额" align="center" width="100">
@@ -47,15 +47,19 @@
 				<el-table-column prop="goods" label="商品件数" align="center" width="100">
 				</el-table-column>
 				<el-table-column prop="time" label="下单时间" align="center" width="100">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.time}}</span>
+                        <span>2</span>
+                    </template>
 				</el-table-column>
 				<el-table-column prop="status" label="订单状态" align="center" width="120">
                 <template slot-scope="scope">
                     {{ handleStatus(scope.row.status) }}
                 </template>
 				</el-table-column>
-                <el-table-column prop="name" label="配送骑手姓名" align="center" width="120">
+                <el-table-column prop="riderName" label="配送骑手姓名" align="center" width="120">
 				</el-table-column>
-                <el-table-column prop="nickname" label="卖家昵称" align="center" width="120">
+                <el-table-column prop="buyerName" label="卖家昵称" align="center" width="120">
 				</el-table-column>
                 <el-table-column label="操作" prop="operate" align="center" min-width="120">
                     <template slot-scope="scope">
@@ -65,38 +69,68 @@
 			</el-table>
         <!-- 进一步查看订单详情 -->
         <el-dialog title="查看订单" :visible.sync="GcLock.check" :close-on-click-model="false" min-width="60vw">
-           <el-form v-model="checkForm">
+           <el-form :data="checkForm">
                 <el-form :inline="true">
-                    <el-form-item label="订单编号">
-                        <el-input v-model="checkForm.number" auto-complete="off"></el-input>
+                    <el-form-item label="订单编号" style="width:45%">
+                        {{checkForm.number}}
                     </el-form-item>
                     <el-form-item label="订单金额">
-                        <el-input v-model="checkForm.money" auto-complete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="订单楼栋">
-                        <el-input v-model="checkForm.building" auto-complete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="下单时间">
-                        <el-input v-model="checkForm.time" auto-complete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="商品件数">
-                        <el-input v-model="checkForm.goods" auto-complete="off"></el-input>
+                        {{checkForm.money}}
                     </el-form-item>
                 </el-form>
-                <el-form-item label="商品简介(包括购买价格以及数量)">
-                    <el-input type="textarea" auto-complete="off"></el-input>
+
+                <el-form :inline="true">
+                    <el-form-item label="订单楼栋" style="width:45%">
+                        {{checkForm.building}}
+                    </el-form-item>
+                    <el-form-item label="下单时间">
+                        {{checkForm.time}}
+                    </el-form-item>
+                </el-form>
+
+                <el-form :inline="true">
+                    <el-form-item label="商品件数" style="width:45%">
+                        {{checkForm.goods}}
+                    </el-form-item>
+                    <el-form-item label="买家地址">
+                        {{checkForm.buyerBuilding}}
+                    </el-form-item>
+                </el-form>
+
+                <el-form-item label="商品照片">
+                    <el-input type="textarea"></el-input>
                 </el-form-item>
-                <el-form-item label="买家地址">
-                    <el-input type="textarea" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="骑手信息">
-                    <el-input type="textarea" auto-complete="off"></el-input>
-                </el-form-item>
+
+                <el-form>
+                    <el-form-item label="商品简介(包括购买价格以及数量)">
+                        {{goodsIntroduce}}
+                    </el-form-item>
+                </el-form>
+                
+                <el-form :inline="true">
+                    <el-form-item label="骑手姓名" style="width:45%">
+                        {{checkForm.riderName}}
+                    </el-form-item>
+                    <el-form-item label="骑手手机号">
+                        {{checkForm.riderPhone}}
+                    </el-form-item>
+                </el-form>
+
+                <el-form :inline="true">
+                    <el-form-item label="管理楼栋" style="width:45%">
+                        {{checkForm.building}}
+                    </el-form-item>
+                    <el-form-item label="工作状态">
+                        {{ handleRiderStatus(checkForm.status) }}
+                    </el-form-item>
+                </el-form>
+
+                <el-form>
+                    <el-form-item label="商品总数">
+                        {{checkForm.ordersNumber}}
+                    </el-form-item>
+                </el-form>
             </el-form>
-            <div slot="footer" class="dialog-footer" style="margin-top:20x;">
-                <el-button @click.native="GcLock.check = false">取消</el-button>
-                <el-button type="primary" @click.native="confirm">确认</el-button>
-            </div>
         </el-dialog>       
     </section>
 </template>
@@ -120,7 +154,13 @@ export default {
                 money: '',
                 building: '',
                 time: '',
-                goods: ''
+                goods: '',
+                status:0,
+                riderName: '',
+                riderPhone: '',
+                ordersNumber: '',
+                buyerBuilding: '',
+                goodsIntroduce: ''
             },
               buildingList: [
                 {
@@ -141,8 +181,12 @@ export default {
                     goods:'10',
                     time:'13:00',
                     status:0,
-                    name:'张三',
-                    nickname:'张哥'
+                    buyerName:'张哥',
+                    riderName: '张三生',
+                    riderPhone: '64465645',
+                    ordersNumber: '100',
+                    buyerBuilding: '',
+                    goodsIntroduce: ''
                 },
                 {
                     number:'521',
@@ -151,8 +195,12 @@ export default {
                     goods:'15',
                     time:'13:00',
                     status:1,
-                    name:'李四',
-                    nickname:'李哥'
+                    buyerName:'李哥',
+                    riderName: '李四',
+                    riderPhone: '321314144',
+                    ordersNumber: '50',
+                    buyerBuilding: '',
+                    goodsIntroduce: ''
                 },
                 {
                     number:'555',
@@ -161,8 +209,12 @@ export default {
                     goods:'20',
                     time:'13:00',
                     status:2,
-                    name:'王五',
-                    nickname:'王哥'
+                    buyerName:'王哥',
+                    riderName: '王五',
+                    riderPhone: '312123123',
+                    ordersNumber: '20',
+                    buyerBuilding: '',
+                    goodsIntroduce: ''
                 }
             ]
         }
@@ -170,13 +222,6 @@ export default {
     methods: {
         handleSeach() {
             alert('查询成功')
-        },
-        handleAdd() {
-            let _this = this;
-            for(let i in _this.addForm) {
-               _this.addForm[i] = ''
-            }
-            _this.GcLock.addGoods = !_this.GcLock.addGoods;
         },
         handleStatus(status) {
             if (status===0) {
@@ -189,10 +234,22 @@ export default {
                 return ''
             }
         },
+        handleRiderStatus(status){
+            let _this = this;
+            return _this.checkForm.status === 1 ? '上班' : '下班' ;
+        },
         handleChange(index, row) {
             let _this = this;
-            _this.GcLock.check = !_this.GcLock.check;
             _this.checkForm = row;
+            _this.GcLock.check = !_this.GcLock.check;
+        }
+    },
+    computed: {
+        aRider: function (){
+            let _this = this;
+            var n = _this.checkForm.status === 1 ? '上班' : '下班' ;
+            return '骑手姓名： '+ _this.checkForm.riderName +'   手机号码： '+ _this.checkForm.riderPhone+'   管理楼栋： '
+            + _this.checkForm.buyerBuilding+'   工作状态： '+ n +'   订单总数： '+ _this.checkForm.ordersNumber;
         }
     }
 }
