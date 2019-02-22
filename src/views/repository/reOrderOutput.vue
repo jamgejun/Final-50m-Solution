@@ -1,0 +1,54 @@
+<template>
+  <section>
+    <!--待出库-->
+    <el-table :data="order2">
+      <el-table-column prop="number" label="订单编号" sortable></el-table-column>
+      <el-table-column prop="money" label="订单金额"></el-table-column>
+      <el-table-column prop="building" label="订单楼栋"></el-table-column>
+      <el-table-column prop="goods" label="商品件数"></el-table-column>
+      <el-table-column prop="time" label="下单时间" sortable></el-table-column>
+      <el-table-column prop="riderName" label="配送骑手姓名"></el-table-column>
+      <el-table-column prop="riderPhone" label="骑手手机号"></el-table-column>、
+      <el-table-column prop="status" label="订单状态" min-width="120">
+        <template slot-scope="scope">
+          {{ handleOrder2Status(scope.row.status) }}
+          <el-button size="small" type="primary">打印订单</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+  </section>
+</template>
+</el-table-column>
+        </el-table>
+    </section>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      //待出库列表
+      order2: [
+        {
+          number: "0000002",
+          money: "15元",
+          building: "22栋",
+          goods: "1件",
+          time: "2019-01-29",
+          riderName: "王五",
+          riderPhone: "142354325",
+          riderStatus: 1,
+          ordersNumber: "1",
+          reason: ""
+        }
+      ]
+    };
+  },
+  methods: {
+    //处理订单状态
+    handleOrder2Status(status) {
+      return status === 1 ? "正在出库" : "待出库 ";
+    }
+  }
+};
+</script>

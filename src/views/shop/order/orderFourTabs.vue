@@ -1,6 +1,6 @@
 <template>
     <section>
-        <el-tabs v-model="activeName" @tab-click="handleClick">
+        <el-tabs v-model="activeName" >
             <el-tab-pane label="当天" name="first">
                 <el-col :span="24">
                     <el-form :inline="true">
