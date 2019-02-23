@@ -104,6 +104,7 @@ import { setInterval, clearInterval } from 'timers';
                   type: 'error'
                 });
               } else {
+                // store.dispatch('login');
                 sessionStorage.setItem('user', JSON.stringify(user));
                 this.$router.push({ path: '/' });
               }

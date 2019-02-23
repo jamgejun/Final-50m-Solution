@@ -1,29 +1,28 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import * as actions from './actions'
-import * as getters from './getters'
-
-Vue.use(Vuex)
-
-// 应用初始状态
-const state = {
-    count: 10
-}
-
-// 定义所需的 mutations
-const mutations = {
-    INCREMENT(state) {
-        state.count++
+export default store = {
+    state: {
+        UserToken:''
     },
-    DECREMENT(state) {
-        state.count--
+    getters: {
+        getToken: state => {
+            return sessionStorage.getItem('token');
+        }
+    },
+    mutations: {
+        LOGIN_IN(state, token) {
+            state.UserToken = token;
+            // 在session中存储token值
+            sessionStorage.setItem('token', token);
+        },
+        LOGIN_OUT(state) {
+            state.UserToken = '';
+        }
+    },
+    action: {
+        login({commit}, token) {
+            commit('LGOIN_IN', token)
+        },
+        loginOut({commit}) {
+            commit('LOGIN_OUT');
+        }
     }
 }
-
-// 创建 store 实例
-export default new Vuex.Store({
-    actions,
-    getters,
-    state,
-    mutations
-})

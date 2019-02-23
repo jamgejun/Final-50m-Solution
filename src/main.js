@@ -16,7 +16,8 @@ import store from './vuex/store'
 import Vuex from 'vuex'
 //import NProgress from 'nprogress'
 //import 'nprogress/nprogress.css'
-import routes from './router/noAuthority'
+// import routes from './router/noAuthority'
+import routes from './router/admin'
 import Mock from './mock'
 Mock.bootstrap();
 
