@@ -232,7 +232,7 @@ let routes = [
                     icon: 'fa fa-weixin',
                     permission: ''
                 },
-                component: (resolve) => require(['@/views/repository/reOrder'], resolve),
+                component: (resolve) => require(['@/views/repository/reOrderAll'], resolve),
             }
         ]
     },
@@ -284,7 +284,7 @@ let routes = [
                     icon: 'fa fa-weixin',
                     permission: ''
                 },
-                component: (resolve) => require(['@/views/admin/sysLog'], resolve),
+                component: (resolve) => require(['@/views/admin/operateLog'], resolve),
             }
         ]
     },
