@@ -6,10 +6,10 @@
                     <el-input v-model="buyerSearch.name" placeholder="请输入买家账号名"></el-input>
                 </el-form-item>
                 <el-form-item prop="trueName" label="真实姓名">
-                    <el-input v-model="buyerSearch.trueName" placeholder="真实姓名"></el-input>
+                    <el-input v-model="buyerSearch.trueName" placeholder="请输入买家真实姓名"></el-input>
                 </el-form-item>
                 <el-form-item prop="phone" label="手机号">
-                    <el-input v-model="buyerSearch.phone" placeholder="手机号"></el-input>
+                    <el-input v-model="buyerSearch.phone" placeholder="请输入买家手机号"></el-input>
                 </el-form-item>
                 <el-form-item prop="duringTime" label="注册时间">
                     <el-date-picker

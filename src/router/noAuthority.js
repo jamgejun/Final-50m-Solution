@@ -133,8 +133,8 @@ let routes = [
         iconCls: 'fa fa-bar-chart',
         children: [
             { 
-                path: '/reOrder', 
-                component: (resolve) => require(['@/views/repository/reOrder'], resolve),
+                path: '/reOrderAll', 
+                component: (resolve) => require(['@/views/repository/reOrderAll'], resolve),
                 name: '分拣管理' 
             }
         ]
@@ -163,9 +163,24 @@ let routes = [
         leaf: true,//只有一个节点
         children: [
             { 
-                path: '/sysLog', 
-                component: (resolve) => require(['@/views/admin/sysLog'], resolve),
+                path: '/operateLog ', 
+                component: (resolve) => require(['@/views/admin/operateLog'], resolve),
                 name: '操作日志' 
+            }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '系统参数',
+        level: 0,
+        iconCls: 'fa fa-address-card',
+        leaf: true,//只有一个节点
+        children: [
+            { 
+                path: '/systemParameter', 
+                component: (resolve) => require(['@/views/admin/systemParameter'], resolve),
+                name: '系统参数' 
             }
         ]
     }

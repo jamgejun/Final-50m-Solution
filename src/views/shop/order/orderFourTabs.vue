@@ -1,6 +1,6 @@
 <template>
     <section>
-        <el-tabs v-model="activeName" >
+        <el-tabs v-model="activeName" @tab-click="handleClick">
             <el-tab-pane label="当天" name="first">
                 <el-col :span="24">
                     <el-form :inline="true">
@@ -78,13 +78,12 @@
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary">点击查询</el-button>
+                        <el-button type="primary">查询</el-button>
                     </el-form-item>
+                    <el-table :data="orderList" v-if="show">
+                        <el-table-column></el-table-column>
+                    </el-table>
                 </el-form>
-                <el-col>
-                    {{ '订单总数' }}
-                    <el-button type="success" @click="handleDayPrev" style="margin-left:20px;">点击查看</el-button>
-                </el-col>
             </el-tab-pane>
         </el-tabs>
     </section>
@@ -108,9 +107,6 @@
       handleClick(tab, event) {
         console.log(tab, event);
       },
-      handleDayPrev() {
-
-      }
     }
   };
 </script>
