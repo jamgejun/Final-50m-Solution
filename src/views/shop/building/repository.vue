@@ -94,7 +94,7 @@
     <el-dialog title="新增仓库" :visible.sync="SwitchLock.addStatus" :close-on-click-model="false">
       <el-form :data="addForm" label-width="80px" ref="changeForm">
         <el-form-item label="仓库名" prop="name">
-          <el-input v-model="changeForm.name" auto-complete="off"></el-input>
+          <el-input v-model="addForm.name" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="运营状态">
           <el-radio-group v-model="addForm.status">
@@ -103,18 +103,21 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="仓库详情" prop="detail">
-          <el-input type="textarea" v-model="changeForm.detail"></el-input>
+          <el-input type="textarea" v-model="addForm.detail"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer" style="margin-top:20x;">
         <el-button @click.native="SwitchLock.addStatus = false">取消</el-button>
-        <el-button type="primary" @click.native="changeSubmit">提交</el-button>
+        <el-button type="primary" @click.native="addSubmit">提交</el-button>
       </div>
     </el-dialog>
   </section>
 </template>
 
 <script>
+
+import { addRepository } from '../../../api/building_repository';
+
 export default {
   data() {
     return {
@@ -210,7 +213,9 @@ export default {
       let _this = this;
       _this.SwitchLock.addStatus = !_this.SwitchLock.addStatus;
     },
-
+    addSubmit() {
+      addRepository(this.addForm);
+    },
     // 处理运营状态
     changeStatus(index, row) {
       let _this = this;

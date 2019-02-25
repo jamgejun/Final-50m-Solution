@@ -32,56 +32,21 @@
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column type="index" width="60"></el-table-column>
       <el-table-column prop="name" label="楼栋名" align="center" width="120" sortable></el-table-column>
-      <el-table-column prop="message" label="楼栋详情" width="200"></el-table-column>
-      <el-table-column prop="status" label="运营状态" align="center" width="200" :forStatus="forStatus">
-        <template slot-scope="scope">{{ scope.row.status === 1 ? '恢复运营' : '暂停运营' }}</template>
-      </el-table-column>
+      <el-table-column prop="info" label="楼栋详情" width="200"></el-table-column>
+      <el-table-column prop="statusName" label="运营状态" align="center" width="200"></el-table-column>
       <el-table-column label="操作" min-width="180">
         <template slot-scope="scope">
           <el-button size="small" @click="handleMessage(scope.$index, scope.row)">修改</el-button>
           <el-button
             size="small"
-            :type="scope.row.status === 1 ? 'warning' : 'success'"
+            :type="scope.row.statusId === 5 ? 'warning' : 'success'"
             @click="handleStatus(scope.$index, scope.row)"
-          >{{ scope.row.status === 1 ? '暂停运营' : '恢复运营' }}</el-button>
+          >{{ scope.row.statusId === 5 ? '暂停运营' : '恢复运营' }}</el-button>
           <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <!--工具条-->
-    <!-- <el-col :span="24" class="toolbar">
-			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
-			</el-pagination>
-    </el-col>-->
-    <!--编辑界面-->
-    <!-- <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="姓名" prop="name">
-					<el-input v-model="editForm.name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="性别">
-					<el-radio-group v-model="editForm.sex">
-						<el-radio class="radio" :label="1">男</el-radio>
-						<el-radio class="radio" :label="0">女</el-radio>
-					</el-radio-group>
-				</el-form-item>
-				<el-form-item label="年龄">
-					<el-input-number v-model="editForm.age" :min="0" :max="200"></el-input-number>
-				</el-form-item>
-				<el-form-item label="生日">
-					<el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
-				</el-form-item>
-				<el-form-item label="地址">
-					<el-input type="textarea" v-model="editForm.addr"></el-input>
-				</el-form-item>
-			</el-form>
-			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="editFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
-			</div>
-    </el-dialog>-->
     <!--新增界面-->
     <el-dialog title="新增楼栋" :visible.sync="dialogVisible" :close-on-click-modal="false">
       <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
@@ -95,7 +60,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="详细信息">
-          <el-input type="textarea" v-model="addForm.message"></el-input>
+          <el-input type="textarea" v-model="addForm.info"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -103,6 +68,7 @@
         <el-button type="primary" @click.native="addSubmit">提交</el-button>
       </div>
     </el-dialog>
+
     <!-- 修改 -->
     <el-dialog title="修改楼栋" :visible.sync="GcLock.change" :close-on-click-model="false">
       <el-form :data="changeForm" label-width="100px" ref="changeForm">
@@ -110,7 +76,7 @@
           <el-input v-model="changeForm.name" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="楼栋名">
-          <el-input v-model="changeForm.message" auto-complete="off"></el-input>
+          <el-input v-model="changeForm.info" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer" style="margin-top:20x;">
@@ -137,8 +103,9 @@ export default {
       addLoading: 0,
       addForm: {
         name: "",
-        message: "",
-        status: 1
+        info: "",
+        status: 1,
+        storageId: '0',
       },
       addFormRules: {
         name: {
@@ -146,9 +113,9 @@ export default {
           message: "请输入楼栋名",
           trigger: "blur"
         },
-        message: {
+        status: {
           required: true,
-          message: "请描述楼栋详细信息",
+          message: "选择楼栋运营状态",
           trigger: "blur"
         }
       },
@@ -162,25 +129,37 @@ export default {
       // 楼栋列表
       buildingList: [
         {
+          id: 0,
           name: "24栋",
-          message: "具体详情信息",
-          status: 0
+          info: "具体详情信息",
+          statusId: 5,
+          statusName: '正常',
+          storageId: 6,
+          storageName: '西门一号仓库'
         },
         {
+          id: 1,
           name: "20栋",
-          message: "具体详情信息",
-          status: 1
+          info: "该公寓紧挨勤工助学中学",
+          statusId: 6,
+          statusName: '停运',
+          storageId: 6,
+          storageName: '燕子超市036仓库'
         },
         {
+          id: 2,
           name: "26栋",
-          message: "具体详情信息",
-          status: 0
+          info: "具体详情信息",
+          statusId: 5,
+          statusName: '正常',
+          storageId: 6,
+          storageName: '燕子超市02仓'
         }
       ],
       //修改
       changeForm: {
         name: "",
-        message: ""
+        info: ""
       }
     };
   },

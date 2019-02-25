@@ -19,6 +19,25 @@ export default {
     mock.onGet('/error').reply(500, {
       msg: 'failure'
     });
+    // 获取验证码
+    mock.onGet('/validatecode').reply(200, {
+      src: 'https://ss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=1845423777,3885331772&fm=58&bpow=596&bpoh=442'
+    })
+    // 登录接口测试
+    mock.onPost('/sys/login').reply(config => {
+      let { userName, password, validateCode }  = JSON.parse(config.data);
+      return new Promise((resolve, reject) => {
+        resolve([200, {
+          'meta': {
+            "success": true,
+            "message": "ok"
+          },
+          'data': {
+            "token": "BD440AED758547498C52E9DD0384B7F5",
+          }
+        }])
+      })
+    })
 
     //登录
     mock.onPost('/login').reply(config => {

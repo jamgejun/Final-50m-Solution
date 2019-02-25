@@ -1,11 +1,11 @@
 <template>
     <el-form :label-position="labelPosition" label-width="68px" :model="ruleForm2" :rules="rules2" ref="ruleForm2" class="demo-ruleForm login-container">
         <h3 class="title">系统登录</h3>
-        <el-form-item label="账号" prop="account">
-          <el-input type="text" v-model="ruleForm2.account" auto-complete="off" placeholder="账号"></el-input>
+        <el-form-item label="账号" prop="userName">
+          <el-input type="text" v-model="ruleForm2.userName" auto-complete="off" placeholder="账号"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="checkPass">
-          <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off" placeholder="密码"></el-input>
+        <el-form-item label="密码" prop="password">
+          <el-input type="password" v-model="ruleForm2.password" auto-complete="off" placeholder="密码"></el-input>
         </el-form-item>
         <el-form-item label="验证码" prop="code">
           <el-input type="text" v-model="ruleForm2.code" auto-complete="off" placeholder="请输入验证码" style="width:60%" ></el-input>
@@ -18,6 +18,9 @@
             </span>
           </el-button>
         </el-form-item>
+        <el-form-item label="" class="code_img" v-if="isDisabled">
+          <img :src="validateCode" alt="">
+        </el-form-item>
         <el-form-item>
           <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
         </el-form-item>
@@ -28,21 +31,25 @@
 <script>
 import { requestLogin } from '../api/api';
 import { setInterval, clearInterval } from 'timers';
+
+// 获取登录接口
+import { getValidatecode, login } from '../api/login';
   export default {
     data() {
       return {
         logining: false,
+        validateCode: '',
         codeTime: 60,
         Timer: null,
         isDisabled: false,
         labelPosition: 'right',
         ruleForm2: {
-          account: 'admin',
-          checkPass: '123456',
+          userName: 'admin',
+          password: '123456',
           code:''
         },
         rules2: {
-          account: [
+          userName: [
             { 
               required: true, 
               message: '请输入账号',
@@ -50,7 +57,7 @@ import { setInterval, clearInterval } from 'timers';
             },
             //{ validator: validaePass }
           ],
-          checkPass: [
+          password: [
             { 
               required: true,
               message: '请输入密码',
@@ -75,15 +82,20 @@ import { setInterval, clearInterval } from 'timers';
       },
       // 发送验证码
       sendCode() {
-        this.isDisabled = true;
-        Timer = setInterval( () => {
-          this.codeTime--
-          if ( this.codeTime === 0 ) {
-            this.isDisabled = false;
-            this.codeTime = 60
-            clearInterval(Timer);
-          }
+        let _this = this;
+        _this.isDisabled = true;
+        // 
+        getValidatecode().then(data => {
+          _this.validateCode = data.data.src;
+          _this.Timer = setInterval( () => {
+            _this.codeTime--
+            if ( _this.codeTime === 0 ) {
+              _this.isDisabled = false;
+              _this.codeTime = 60
+              clearInterval(_this.Timer);
+            }
         }, 1000)
+        });
       },
       // 处理登录
       handleSubmit2(ev) {
@@ -93,7 +105,7 @@ import { setInterval, clearInterval } from 'timers';
             //_this.$router.replace('/table');
             this.logining = true;
             //NProgress.start();
-            var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
+            var loginParams = { username: this.ruleForm2.userName, password: this.ruleForm2.password };
             requestLogin(loginParams).then(data => {
               this.logining = false;
               //NProgress.done();
@@ -141,6 +153,14 @@ import { setInterval, clearInterval } from 'timers';
     }
     .remember {
       margin: 0px 0px 0px 0px;
+    }
+  }
+  .code_img {
+    margin-bottom: 0px;
+    img {
+      width: 150px;
+      height: 40px;
+      background:#505458;
     }
   }
 </style>
