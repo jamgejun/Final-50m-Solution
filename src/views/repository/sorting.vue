@@ -64,7 +64,7 @@
       :close-on-click-model="false"
       min-width="60vw"
     >
-      <el-form :data="checkForm">
+      <el-form :data="checkForm" id="table">
         <el-form :inline="true">
           <el-form-item label="订单编号" style="width:45%">{{checkForm.number}}</el-form-item>
           <el-form-item label="订单金额">{{checkForm.money}}</el-form-item>
@@ -85,7 +85,7 @@
         </el-form-item>
 
         <el-form>
-          <el-form-item label="商品简介(包括购买价格以及数量)">{{goodsIntroduce}}</el-form-item>
+          <el-form-item label="商品简介(包括购买价格以及数量)">{{checkForm.goodsIntroduce}}</el-form-item>
         </el-form>
 
         <el-form :inline="true">
