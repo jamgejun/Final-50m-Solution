@@ -16,15 +16,12 @@
         </template>
       </el-table-column>
     </el-table>
-
-    <el-dialog :visible.sync="show">
-      <el-form id="table">
-        <el-form-item style="color: red">
-          打印
-          <el-button size="small" type="primary" @click="Print()">打印订单</el-button>
-        </el-form-item>
-      </el-form>
-    </el-dialog>
+    <el-form id="table">
+      <el-form-item style="color: red">
+        打印
+        <el-button size="small" type="primary" @click="Print()">打印订单</el-button>
+      </el-form-item>
+    </el-form>
   </section>
 </template>
 
@@ -71,7 +68,7 @@ export default {
     },
     // 打印订单
     Print() {
-      jquery('#table').printMe({ "path": ['../../assets/print.css'] })
+      jquery('#table').printMe()
     }
   }
 };
