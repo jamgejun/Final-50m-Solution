@@ -34,6 +34,8 @@ import { setInterval, clearInterval } from 'timers';
 
 // 获取登录接口
 import { getValidatecode, login } from '../api/login';
+import Axios from 'axios';
+import { log } from 'util';
   export default {
     data() {
       return {
@@ -84,9 +86,10 @@ import { getValidatecode, login } from '../api/login';
       sendCode() {
         let _this = this;
         _this.isDisabled = true;
-        // 
-        getValidatecode().then(data => {
-          _this.validateCode = data.data.src;
+        // 此处就是调用一个ajax申请
+        _this.$ajax.get('/captcha'
+        ).then((res) => {
+          _this.validateCode = 'http://t159z26789.iask.in/f50m-web/captcha';
           _this.Timer = setInterval( () => {
             _this.codeTime--
             if ( _this.codeTime === 0 ) {
@@ -95,7 +98,9 @@ import { getValidatecode, login } from '../api/login';
               clearInterval(_this.Timer);
             }
         }, 1000)
-        });
+        }).catch((err) => {
+          console.log(err)
+        })
       },
       // 处理登录
       handleSubmit2(ev) {

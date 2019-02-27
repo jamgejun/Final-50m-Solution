@@ -1,7 +1,5 @@
 <template>
     <section>
-        
-        <order-tabs></order-tabs>
         <el-col :span="24" class="toolbar">
             <el-form :inline="true" :data="orderRiderSearch">
                 <el-form-item>

@@ -2,7 +2,7 @@ import axios from 'axios';
 import base  from './baseUrl';
 
 export const getValidatecode = () => { 
-    return axios.get(`${base}/validatecode`);
+    return axios.get(`${base}/captcha`);
 }
 
 export const login = (params) => { 

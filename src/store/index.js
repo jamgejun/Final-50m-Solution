@@ -1,6 +1,6 @@
-export default store = {
+export const user =  {
     state: {
-        UserToken:''
+        userToken:''
     },
     getters: {
         getToken: state => {
@@ -9,12 +9,12 @@ export default store = {
     },
     mutations: {
         LOGIN_IN(state, token) {
-            state.UserToken = token;
+            state.userToken = token;
             // 在session中存储token值
             sessionStorage.setItem('token', token);
         },
         LOGIN_OUT(state) {
-            state.UserToken = '';
+            state.userToken = '';
         }
     },
     action: {

@@ -27,7 +27,15 @@ module.exports = {
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/api': {  //使用"/api"来代替"http://f.apiplus.c" 
+      target: 'http://t159z26789.iask.in/f50m-web', //源地址 
+      changeOrigin: true, //改变源 
+      pathRewrite: { 
+        '^/api': '' //路径重写 
+        } 
+    } 
+    },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README
     // (https://github.com/webpack/css-loader#sourcemaps)

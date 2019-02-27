@@ -12,14 +12,13 @@
       <el-table-column prop="status" label="订单状态" min-width="120">
         <template slot-scope="scope">
           {{ handleOrderStatus(scope.row.status) }}
-          <el-button size="small" type="primary">打印订单</el-button>
+          <el-button size="small" type="primary" @click="Print()">打印订单</el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-form id="table">
       <el-form-item style="color: red">
-        打印
-        <el-button size="small" type="primary" @click="Print()">打印订单</el-button>
+        具体内容的打印
       </el-form-item>
     </el-form>
   </section>

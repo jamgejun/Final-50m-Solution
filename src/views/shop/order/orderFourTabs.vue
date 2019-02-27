@@ -90,6 +90,7 @@
 </template>
 <script>
   export default {
+    props: [''],
     data() {
       return {
         activeName: 'first',
