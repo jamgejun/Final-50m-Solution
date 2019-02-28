@@ -1,140 +1,138 @@
 <template>
     <el-form :label-position="labelPosition" label-width="68px" :model="ruleForm2" :rules="rules2" ref="ruleForm2" class="demo-ruleForm login-container">
         <h3 class="title">系统登录</h3>
-        <el-form-item label="账号" prop="userName">
-          <el-input type="text" v-model="ruleForm2.userName" auto-complete="off" placeholder="账号"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input type="password" v-model="ruleForm2.password" auto-complete="off" placeholder="密码"></el-input>
-        </el-form-item>
-        <el-form-item label="验证码" prop="code">
-          <el-input type="text" v-model="ruleForm2.code" auto-complete="off" placeholder="请输入验证码" style="width:60%" ></el-input>
-          <el-button type="primary" @click.native.prevent = "sendCode" style="width:38%" :disabled="isDisabled">
-            <span v-if="!isDisabled">
-              获取验证码
-            </span>
-            <span v-else>
-              {{ this.codeTime }}秒后重试
-            </span>
-          </el-button>
-        </el-form-item>
-        <el-form-item label="" class="code_img" v-if="isDisabled">
-          <img :src="validateCode" alt="">
-        </el-form-item>
-        <el-form-item>
-          <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
-        </el-form-item>
-        <el-button type="primary" style="width:100%;" @click.native.prevent="handleSubmit2" :loading="logining">登录</el-button>
+            <el-form-item label="账号" prop="userName">
+                <el-input type="text" v-model="ruleForm2.userName" auto-complete="off" placeholder="账号"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="password">
+                <el-input type="password" v-model="ruleForm2.password" auto-complete="off" placeholder="密码"></el-input>
+            </el-form-item>
+            <el-form-item label="验证码" prop="code">
+                <el-input type="text" v-model="ruleForm2.code" auto-complete="off" placeholder="请输入验证码" style="width:60%" ></el-input>
+                <el-button type="primary" @click.native.prevent = "sendCode" style="width:38%" :disabled="isDisabled">
+                    <span v-if="!isDisabled">
+                    获取验证码
+                    </span>
+                    <span v-else>
+                    {{ this.codeTime }}秒后重试
+                    </span>
+                </el-button>
+            </el-form-item>
+            <el-form-item label="" class="code_img" v-if="isDisabled">
+                <img :src="validateCode" alt="">
+            </el-form-item>
+            <el-form-item>
+                <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
+            </el-form-item>
+            <el-button type="primary" style="width:100%;" @click.native.prevent="handleSubmit2" :loading="logining">登录</el-button>
   </el-form>
 </template>
 
 <script>
-import { requestLogin } from '../api/api';
-import { setInterval, clearInterval } from 'timers';
-
 // 获取登录接口
-import { getValidatecode, login } from '../api/login';
-import Axios from 'axios';
-import { log } from 'util';
-  export default {
+import { getValidatecode, login, getMenus } from '../api/login';
+import { setRouter } from '../router/setRouter'
+export default {
     data() {
-      return {
-        logining: false,
-        validateCode: '',
-        codeTime: 60,
-        Timer: null,
-        isDisabled: false,
-        labelPosition: 'right',
-        ruleForm2: {
-          userName: 'admin',
-          password: '123456',
-          code:''
-        },
-        rules2: {
-          userName: [
-            { 
-              required: true, 
-              message: '请输入账号',
-              trigger: 'blur' 
+        return {
+            logining: false,
+            validateCode: '',
+            codeTime: 60,
+            Timer: null,
+            isDisabled: false,
+            labelPosition: 'right',
+            ruleForm2: {
+                userName: 'admin',
+                password: '123456',
+                code:''
             },
-            //{ validator: validaePass }
-          ],
-          password: [
-            { 
-              required: true,
-              message: '请输入密码',
-              trigger: 'blur'
+            rules2: {
+            userName: [
+                { 
+                    required: true, 
+                    message: '请输入账号',
+                    trigger: 'blur' 
+                },
+                //{ validator: validaePass }
+            ],
+            password: [
+                { 
+                    required: true,
+                    message: '请输入密码',
+                    trigger: 'blur'
+                },
+                //{ validator: validaePass2 }
+            ],
+            code: [
+                {
+                    required: true,
+                    message: '请输入验证码',
+                    trigger: 'blur'
+                }
+            ]
             },
-            //{ validator: validaePass2 }
-          ],
-          code: [
-            {
-              required: true,
-              message: '请输入验证码',
-              trigger: 'blur'
-            }
-          ]
-        },
-        checked: true
-      };
+            checked: true
+        };
     },
     methods: {
-      handleReset2() {
-        this.$refs['ruleForm2'].resetFields();
-      },
-      // 发送验证码
-      sendCode() {
+        handleReset2() {
+            this.$refs['ruleForm2'].resetFields();
+        },
+    // 发送验证码
+    sendCode() {
         let _this = this;
         _this.isDisabled = true;
         // 此处就是调用一个ajax申请
-        _this.$ajax.get('/captcha'
-        ).then((res) => {
-          _this.validateCode = 'http://t159z26789.iask.in/f50m-web/captcha';
-          _this.Timer = setInterval( () => {
-            _this.codeTime--
-            if ( _this.codeTime === 0 ) {
-              _this.isDisabled = false;
-              _this.codeTime = 60
-              clearInterval(_this.Timer);
-            }
-        }, 1000)
+        getValidatecode(_this).then((res) => {
+            _this.validateCode = 'http://t159z26789.iask.in/f50m-web/captcha';
+            _this.Timer = setInterval( () => {
+                _this.codeTime--
+                if ( _this.codeTime === 0 ) {
+                _this.isDisabled = false;
+                _this.codeTime = 60
+                clearInterval(_this.Timer);
+                }
+            }, 1000)
         }).catch((err) => {
-          console.log(err)
+            console.log(err)
         })
-      },
-      // 处理登录
-      handleSubmit2(ev) {
+    },
+    // 处理登录
+    handleSubmit2(ev) {
         var _this = this;
-        this.$refs.ruleForm2.validate((valid) => {
-          if (valid) {
-            //_this.$router.replace('/table');
-            this.logining = true;
-            //NProgress.start();
-            var loginParams = { username: this.ruleForm2.userName, password: this.ruleForm2.password };
-            requestLogin(loginParams).then(data => {
-              this.logining = false;
-              //NProgress.done();
-              let { msg, code, user } = data;
-              if (code !== 200) {
-                this.$message({
-                  message: msg,
-                  type: 'error'
-                });
-              } else {
-                // store.dispatch('login');
-                sessionStorage.setItem('user', JSON.stringify(user));
-                this.$router.push({ path: '/' });
-              }
-            });
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
-      }
-    }
-  }
+        _this.$router.push('/')
+        // 1. 查看各表单填写是否正确
+        // _this.$refs.ruleForm2.validate((valid) => {
+        //     // 如果都是正确
+        //     if (valid) {
+        //         _this.logining = true;
 
+        //         // 调用登录接口
+        //         login(_this, {
+        //             userName: _this.ruleForm2.userName,
+        //             password: _this.ruleForm2.password,
+        //             validateCode: _this.ruleForm2.code
+        //         }).then((res) => {
+        //             // 登录成功后设置token值
+        //             let token = res.token
+        //             store.dispatch('login', token);
+
+        //             // 获取菜单
+        //             getMenus(ev, params).then((res) => {
+        //                 let routerList = res.routerList
+        //                 store.dispatch('getMenus', _this, routerList)
+        //             }).catch((err) => {
+        //                 console.log(err)  
+        //             })
+
+        //         }).catch((err) => {
+        //             console.log(err)
+        //         })
+        //     }
+        // });
+    }
+}
+}
 </script>
 
 <style lang="scss" scoped>

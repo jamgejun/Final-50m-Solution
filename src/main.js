@@ -6,6 +6,7 @@ import axios from 'axios'
 // 使用ElementUI
 import ElementUI from 'element-ui'
 
+import { getMenus } from './api/login'
 // 两套不同主体的切换
 // import 'element-ui/lib/theme-default/index.css'
 import './assets/theme/theme-green/index.css'
@@ -42,30 +43,40 @@ const router = new VueRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  if (to.path == '/login') {
-    sessionStorage.removeItem('user');
-  }
-  let user = JSON.parse(sessionStorage.getItem('user'));
-  if (!user && to.path != '/login') {
-    next({ path: '/login' })
-  } else {
-    next()
-  }
-})
-
 // router.beforeEach((to, from, next) => {
-//   if (!store.state.userToken) {
-//     if (to.matched.length>0 && !to.matched.some(record => record.meta.requiresAuth)) {
-//       next()
-//     } else {
-//       next({
-//         path: '/login'
-//       })
-//     }
-//   } else {
-    
-//   }
+// 	if (!store.state.userToken) {
+// 		console.log('没有权限 只能登录不需要权限的路由');
+// 		if (to.matched.length>0 && !to.matched.some(record => record.meta.requiresAuth)) {
+// 			next()
+// 		} else {
+// 			next({
+// 				path: '/login'
+// 			})
+// 		}
+// 	} else {
+// 		console.log('有了token，但没有路由权限列表')
+// 		if (!store.state.permissionList) {
+
+// 			// 
+// 			getMenus(ev, params).then((res) => {
+// 				let routerList = res.routerList
+// 				store.dispatch('getMenus', routerList)
+// 				next({
+// 					path: to.path
+// 				})
+// 			}).catch((err) => {
+// 				console.log(err)  
+// 			})
+
+// 		} else {
+// 			//  如果都存在 则放行
+// 			if (to.path !== '/login') {
+//                 next()
+//             } else {
+//                 next(from.fullPath)
+//             }
+// 		}
+// 	}
 // })
 
 //router.afterEach(transition => {

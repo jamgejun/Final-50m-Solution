@@ -4,10 +4,10 @@ import Home from '../views/Home.vue';
 let routes = [
     {
         path: '/login',
-        component: (resolve) => require(['@/views/Login'], resolve),
         name: '登录',
+        component: (resolve) => require(['@/views/Login'], resolve),
         meta: {
-            requiresAuth: false
+            requiresAuth: false,
         }
     },
     {

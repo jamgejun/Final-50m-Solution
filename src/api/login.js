@@ -1,10 +1,18 @@
-import axios from 'axios';
-import base  from './baseUrl';
-
-export const getValidatecode = () => { 
-    return axios.get(`${base}/captcha`);
+// 获取验证码
+export const getValidatecode = (ev) => { 
+    return ev.$ajax.get('/captcha');
 }
 
-export const login = (params) => { 
-    return axios.get(`${base}/sys/login`, { params: params }); 
+// 处理登录
+export const login = (ev, params) => { 
+    return ev.$ajax.get('/sys/login', { 
+        params: params 
+    }); 
+}
+
+// 获取菜单列表项
+export const getMenus = (ev, params) => {
+    return ev.$ajax.get('/sys/menus', {
+        params: params
+    })
 }

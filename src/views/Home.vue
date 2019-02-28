@@ -23,9 +23,9 @@
 		<el-col :span="24" class="main">
 			<aside :class="collapsed?'menu-collapsed':'menu-expanded'">
 				<!--导航菜单-->
-				<el-menu class="el-menu-vertical-demo" router v-show="!collapsed">
+				<el-menu class="el-menu-vertical-demo" router v-show="!collapsed" id="leftMenus">
 					<template
-						v-for="(item,index) in $router.options.routes" 
+						v-for="(item,index) in routes" 
 						v-if="hanleLevel(item)">
 						<el-submenu :key="index" :index="String(item.meta.id)">
 							<template slot="title">
@@ -68,6 +68,7 @@
 				sysUserName: '',
 				sysUserAvatar: '',
 				sysUserLevel: '',
+				routes: [],
 				form: {
 					name: '',
 					region: '',
@@ -85,16 +86,7 @@
 				console.log('submit!');
 			},
 			hanleLevel(item) {
-				let _this = this;
-				if (_this.sysUserLevel === 0 && item.meta.requiresAuth) {
-					return true;
-				} else if (item.meta.requiresAuth) {
-					return item.level === _this.sysUserLevel;
-				} else if (item.meta.requiresAuth) {
-					return item.level === _this.sysUserLevel;
-				} else {
-					return false
-				}
+				return item.meta.requiresAuth;
 			},
 			//退出登录
 			logout: function () {
@@ -109,14 +101,16 @@
 			}
 		},
 		mounted() {
+			let _this = this;
 			var user = sessionStorage.getItem('user');
 			if (user) {
 				user = JSON.parse(user);
 				console.log(user);
 				this.sysUserName = user.name || '';
 				this.sysUserAvatar = user.avatar || '';
-				this.sysUserLevel = user.id;
+				this.sysUserLevel = 0;
 			}
+			_this.routes = _this.$router.options.routes;
 		}
 	}
 </script>
@@ -190,6 +184,7 @@
 			bottom: 0px;
 			overflow: hidden;
 			aside {
+				overflow: hidden;
 				flex:0 0 200px;
 				width: 200px;
 				// position: absolute;
@@ -197,6 +192,10 @@
 				// bottom: 0px;
 				.el-menu{
 					height: 100%;
+				}
+				#leftMenus {
+					width: 220px;
+					overflow-y: scroll;
 				}
 				.collapsed{
 					width:60px;

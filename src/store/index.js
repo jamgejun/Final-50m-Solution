@@ -1,9 +1,12 @@
-export const user =  {
+import setRouter from '../router/setRouter'
+
+export default {
     state: {
-        userToken:''
+        userToken:'',
+        permissionList: [],
     },
     getters: {
-        getToken: state => {
+        getToken: () => {
             return sessionStorage.getItem('token');
         }
     },
@@ -15,6 +18,10 @@ export const user =  {
         },
         LOGIN_OUT(state) {
             state.userToken = '';
+        },
+        SET_MENUS(state, ev, routerList) {
+            state.permissionList = routerList;
+            setRouter(ev, routerList);
         }
     },
     action: {
@@ -23,6 +30,9 @@ export const user =  {
         },
         loginOut({commit}) {
             commit('LOGIN_OUT');
+        },
+        getMenus({commit}, routerList) {
+            commit('SET_MENUS', routerList);
         }
     }
 }
