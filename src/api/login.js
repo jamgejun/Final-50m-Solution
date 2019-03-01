@@ -5,7 +5,7 @@ export const getValidatecode = (ev) => {
 
 // 处理登录
 export const login = (ev, params) => { 
-    return ev.$ajax.get('/sys/login', { 
+    return ev.$ajax.post('/sys/login', { 
         params: params 
     }); 
 }

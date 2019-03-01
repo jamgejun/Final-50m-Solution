@@ -43,41 +43,41 @@ const router = new VueRouter({
   routes
 })
 
-// router.beforeEach((to, from, next) => {
-// 	if (!store.state.userToken) {
-// 		console.log('没有权限 只能登录不需要权限的路由');
-// 		if (to.matched.length>0 && !to.matched.some(record => record.meta.requiresAuth)) {
-// 			next()
-// 		} else {
-// 			next({
-// 				path: '/login'
-// 			})
-// 		}
-// 	} else {
-// 		console.log('有了token，但没有路由权限列表')
-// 		if (!store.state.permissionList) {
+router.beforeEach((to, from, next) => {
+	if (!store.state.userToken) {
+		console.log('没有权限 只能登录不需要权限的路由');
+		if (to.matched.length>0 && !to.matched.some(record => record.meta.requiresAuth)) {
+			next()
+		} else {
+			next({
+				path: '/login'
+			})
+		}
+	} else {
+		// console.log('有了token，但没有路由权限列表')
+		// if (!store.state.permissionList) {
 
-// 			// 
-// 			getMenus(ev, params).then((res) => {
-// 				let routerList = res.routerList
-// 				store.dispatch('getMenus', routerList)
-// 				next({
-// 					path: to.path
-// 				})
-// 			}).catch((err) => {
-// 				console.log(err)  
-// 			})
+		// 	// 
+		// 	getMenus(ev, params).then((res) => {
+		// 		let routerList = res.routerList
+		// 		store.dispatch('getMenus', routerList)
+		// 		next({
+		// 			path: to.path
+		// 		})
+		// 	}).catch((err) => {
+		// 		console.log(err)  
+		// 	})
 
-// 		} else {
-// 			//  如果都存在 则放行
-// 			if (to.path !== '/login') {
-//                 next()
-//             } else {
-//                 next(from.fullPath)
-//             }
-// 		}
-// 	}
-// })
+		// } else {
+		// 	//  如果都存在 则放行
+		// 	if (to.path !== '/login') {
+    //             next()
+    //         } else {
+    //             next(from.fullPath)
+    //         }
+		// }
+	}
+})
 
 //router.afterEach(transition => {
 //NProgress.done();

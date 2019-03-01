@@ -7,19 +7,17 @@
             <el-form-item label="密码" prop="password">
                 <el-input type="password" v-model="ruleForm2.password" auto-complete="off" placeholder="密码"></el-input>
             </el-form-item>
-            <el-form-item label="验证码" prop="code">
-                <el-input type="text" v-model="ruleForm2.code" auto-complete="off" placeholder="请输入验证码" style="width:60%" ></el-input>
-                <el-button type="primary" @click.native.prevent = "sendCode" style="width:38%" :disabled="isDisabled">
+            <el-form-item label="验证码" prop="code" :inline="true">
+                <el-input type="text" v-model="ruleForm2.code" auto-complete="off" placeholder="请输入验证码" style="width:50%; diaplay:inline-block" ></el-input>
+                <!-- <el-button type="primary" @click.native.prevent = "sendCode" style="width:38%" :disabled="isDisabled">
                     <span v-if="!isDisabled">
                     获取验证码
                     </span>
                     <span v-else>
                     {{ this.codeTime }}秒后重试
                     </span>
-                </el-button>
-            </el-form-item>
-            <el-form-item label="" class="code_img" v-if="isDisabled">
-                <img :src="validateCode" alt="">
+                </el-button> -->
+                <img :src="validateCode" alt="" style="width:45%; vertical-align: middle;">
             </el-form-item>
             <el-form-item>
                 <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
@@ -42,8 +40,8 @@ export default {
             isDisabled: false,
             labelPosition: 'right',
             ruleForm2: {
-                userName: 'admin',
-                password: '123456',
+                userName: 'admin_sysUser',
+                password: '',
                 code:''
             },
             rules2: {
@@ -78,60 +76,79 @@ export default {
         handleReset2() {
             this.$refs['ruleForm2'].resetFields();
         },
-    // 发送验证码
-    sendCode() {
+        // 发送验证码
+        sendCode() {
+            getValidatecode(_this).then((res) => {
+                _this.validateCode = 'http://t159z26789.iask.in/f50m-web/captcha';
+            }).catch((err) => {
+                console.log(err)
+            })
+        },
+        // 处理登录
+        handleSubmit2(ev) {
+            var _this = this;
+            _this.$router.push('/')
+            // 1. 查看各表单填写是否正确
+            _this.$refs.ruleForm2.validate((valid) => {
+                // 如果都是正确
+                if (valid) {
+                    _this.logining = true;
+                    // 调用登录接口
+                    login(_this, {
+                        userName: _this.ruleForm2.userName,
+                        password: _this.ruleForm2.password,
+                        validateCode: _this.ruleForm2.code
+                    }).then((res) => {
+                        // 登录成功后设置token值
+                        console.log(res.data.meta.message);
+                        if (!res.data.success) {
+                            _this.$message({
+                                message: res.data.meta.message,
+                                type: 'warning'
+                            })
+                            _this.logining = false;
+                            sendCode();
+                        }
+                        let token = res.token
+                        _this.store.dispatch('login', token);
+
+                        // 获取菜单
+                        // getMenus(ev, params).then((res) => {
+                        //     let routerList = res.routerList
+                        //     _this.$store.dispatch('getMenus', _this, routerList)
+                        // }).catch((err) => {
+                        //     console.log(err)  
+                        // })
+
+                    }).catch((err) => {
+                        console.log(err)
+                    })
+                }
+            });
+        },
+    },
+    mounted() {
         let _this = this;
         _this.isDisabled = true;
         // 此处就是调用一个ajax申请
         getValidatecode(_this).then((res) => {
             _this.validateCode = 'http://t159z26789.iask.in/f50m-web/captcha';
-            _this.Timer = setInterval( () => {
-                _this.codeTime--
-                if ( _this.codeTime === 0 ) {
-                _this.isDisabled = false;
-                _this.codeTime = 60
-                clearInterval(_this.Timer);
-                }
-            }, 1000)
         }).catch((err) => {
             console.log(err)
         })
-    },
-    // 处理登录
-    handleSubmit2(ev) {
-        var _this = this;
-        _this.$router.push('/')
-        // 1. 查看各表单填写是否正确
-        // _this.$refs.ruleForm2.validate((valid) => {
-        //     // 如果都是正确
-        //     if (valid) {
-        //         _this.logining = true;
 
-        //         // 调用登录接口
-        //         login(_this, {
-        //             userName: _this.ruleForm2.userName,
-        //             password: _this.ruleForm2.password,
-        //             validateCode: _this.ruleForm2.code
-        //         }).then((res) => {
-        //             // 登录成功后设置token值
-        //             let token = res.token
-        //             store.dispatch('login', token);
-
-        //             // 获取菜单
-        //             getMenus(ev, params).then((res) => {
-        //                 let routerList = res.routerList
-        //                 store.dispatch('getMenus', _this, routerList)
-        //             }).catch((err) => {
-        //                 console.log(err)  
-        //             })
-
-        //         }).catch((err) => {
-        //             console.log(err)
-        //         })
-        //     }
-        // });
+        _this.Timer = setInterval( () => {
+            _this.codeTime--
+            if ( _this.codeTime === 0 ) {
+                _this.codeTime = 60
+                getValidatecode(_this).then((res) => {
+                    _this.validateCode = 'http://t159z26789.iask.in/f50m-web/captcha';
+                }).catch((err) => {
+                    console.log(err)
+                })
+            }
+        }, 1000)
     }
-}
 }
 </script>
 
