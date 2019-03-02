@@ -4,6 +4,7 @@ export default {
     state: {
         userToken:'',
         permissionList: [],
+        sessionTimeOut: 60
     },
     getters: {
         getToken: () => {
@@ -19,14 +20,22 @@ export default {
         LOGIN_OUT(state) {
             state.userToken = '';
         },
-        SET_MENUS(state, ev, routerList) {
+        SET_MENUS(state, routerList) {
             state.permissionList = routerList;
-            setRouter(ev, routerList);
+        },
+        SET_SESSION(state, ev) {
+            state.userToken = ''
+            sessionStorage.removeItem('token')
+            ev.$message({
+                message: '登录已过期，请重新登录！',
+                type: 'warning'
+            })
+            ev.$router.push('/login')
         }
     },
-    action: {
+    actions: {
         login({commit}, token) {
-            commit('LGOIN_IN', token)
+            commit('LOGIN_IN', token)
         },
         loginOut({commit}) {
             commit('LOGIN_OUT');

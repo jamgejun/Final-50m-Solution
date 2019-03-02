@@ -28,13 +28,27 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/api': {  //使用"/api"来代替"http://f.apiplus.c" 
-      target: 'http://t159z26789.iask.in/f50m-web', //源地址 
-      changeOrigin: true, //改变源 
-      pathRewrite: { 
-        '^/api': '' //路径重写 
-        } 
-    } 
+        '/api': {  //使用"/api"来代替"http://f.apiplus.c" 
+        target: 'http://t159z26789.iask.in/f50m-web', //源地址 
+        changeOrigin: true, //改变源 
+        pathRewrite: { 
+          '^/api': '' //路径重写 
+          } ,
+        onProxyRes(proxyRes, req, res) {
+                var cookies = proxyRes.headers['set-cookie']
+                if (cookies == null || cookies.length == 0) {
+                    delete proxyRes.headers['set-cookie']
+                    return
+                }
+                for (var i = 0,n = cookies.length; i < n; i++) {
+                    if(cookies[i].match(/^JSESSIONID=[^;]+;[\s\S]*Path=\/[^;]+/)){
+                        cookies[i] = cookies[i].replace(/Path=\/[^;]+/,'Path=/');
+                    }
+                }
+
+            proxyRes.headers['set-cookie'] = cookies;
+        }
+      }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

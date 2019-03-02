@@ -9,15 +9,7 @@
             </el-form-item>
             <el-form-item label="验证码" prop="code" :inline="true">
                 <el-input type="text" v-model="ruleForm2.code" auto-complete="off" placeholder="请输入验证码" style="width:50%; diaplay:inline-block" ></el-input>
-                <!-- <el-button type="primary" @click.native.prevent = "sendCode" style="width:38%" :disabled="isDisabled">
-                    <span v-if="!isDisabled">
-                    获取验证码
-                    </span>
-                    <span v-else>
-                    {{ this.codeTime }}秒后重试
-                    </span>
-                </el-button> -->
-                <img :src="validateCode" alt="" style="width:45%; vertical-align: middle;">
+                <img :src="validateCode" alt="点击重新获取验证码" class="validateCode" @click='sendCode()'>
             </el-form-item>
             <el-form-item>
                 <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
@@ -40,7 +32,7 @@ export default {
             isDisabled: false,
             labelPosition: 'right',
             ruleForm2: {
-                userName: 'admin_sysUser',
+                userName: 'admin',
                 password: '',
                 code:''
             },
@@ -78,17 +70,12 @@ export default {
         },
         // 发送验证码
         sendCode() {
-            getValidatecode(_this).then((res) => {
-                _this.validateCode = 'http://t159z26789.iask.in/f50m-web/captcha';
-            }).catch((err) => {
-                console.log(err)
-            })
+            let _this = this;
+            getValidatecode(_this);
         },
         // 处理登录
         handleSubmit2(ev) {
-            var _this = this;
-            _this.$router.push('/')
-            // 1. 查看各表单填写是否正确
+            let _this = this;
             _this.$refs.ruleForm2.validate((valid) => {
                 // 如果都是正确
                 if (valid) {
@@ -99,27 +86,36 @@ export default {
                         password: _this.ruleForm2.password,
                         validateCode: _this.ruleForm2.code
                     }).then((res) => {
-                        // 登录成功后设置token值
-                        console.log(res.data.meta.message);
-                        if (!res.data.success) {
+                        if (!res.data.meta.success) {
+                            // 提示错误信息
                             _this.$message({
                                 message: res.data.meta.message,
                                 type: 'warning'
                             })
                             _this.logining = false;
-                            sendCode();
+                            getValidatecode(_this);
+                        } else {
+                            // 告知成功信息
+                            _this.$message({
+                                message: res.data.meta.message,
+                                type: 'success'
+                            })
+                            clearInterval(_this.Timer)
+                            // 设置token值。
+                            _this.$store.dispatch('login', res.data.data.token);
+                            _this.$ajax.defaults.headers.common["X-SDX-Token"] = _this.$store.state.userToken;
+                            // 获取菜单
+                            getMenus(_this).then((res) => {
+                                console.log(res);
+                                let rows = res.data.data.rows
+                                // 将目录存到Vuex中去
+                                _this.$store.dispatch('getMenus', rows);
+                                setRouter(_this, _this.$store.state.permissionList)
+                            }).catch((err) => {
+                                console.log(err)  
+                            })
+                            _this.$router.push('/');
                         }
-                        let token = res.token
-                        _this.store.dispatch('login', token);
-
-                        // 获取菜单
-                        // getMenus(ev, params).then((res) => {
-                        //     let routerList = res.routerList
-                        //     _this.$store.dispatch('getMenus', _this, routerList)
-                        // }).catch((err) => {
-                        //     console.log(err)  
-                        // })
-
                     }).catch((err) => {
                         console.log(err)
                     })
@@ -129,23 +125,14 @@ export default {
     },
     mounted() {
         let _this = this;
-        _this.isDisabled = true;
-        // 此处就是调用一个ajax申请
-        getValidatecode(_this).then((res) => {
-            _this.validateCode = 'http://t159z26789.iask.in/f50m-web/captcha';
-        }).catch((err) => {
-            console.log(err)
-        })
-
+        // 获取验证码
+        getValidatecode(_this);
+        // 60秒自动刷新
         _this.Timer = setInterval( () => {
             _this.codeTime--
             if ( _this.codeTime === 0 ) {
                 _this.codeTime = 60
-                getValidatecode(_this).then((res) => {
-                    _this.validateCode = 'http://t159z26789.iask.in/f50m-web/captcha';
-                }).catch((err) => {
-                    console.log(err)
-                })
+                getValidatecode(_this)
             }
         }, 1000)
     }
@@ -175,12 +162,9 @@ export default {
       margin: 0px 0px 0px 0px;
     }
   }
-  .code_img {
-    margin-bottom: 0px;
-    img {
-      width: 150px;
-      height: 40px;
-      background:#505458;
-    }
+  .validateCode {
+        width:45%; 
+        vertical-align: middle;
+        cursor: pointer;
   }
 </style>
