@@ -4,7 +4,8 @@ export default {
     state: {
         userToken:'',
         permissionList: [],
-        sessionTimeOut: 60
+        sessionTimeOut: 60,
+        routesList: []
     },
     getters: {
         getToken: () => {
@@ -22,6 +23,9 @@ export default {
         },
         SET_MENUS(state, routerList) {
             state.permissionList = routerList;
+        },
+        SET_ROUTES(state, routesList) {
+            state.routesList = routesList;
         },
         SET_SESSION(state, ev) {
             state.userToken = ''
@@ -42,6 +46,9 @@ export default {
         },
         getMenus({commit}, routerList) {
             commit('SET_MENUS', routerList);
+        },
+        setRoutes({commit}, routesList) {
+            commit('SET_ROUTES', routesList)
         }
     }
 }

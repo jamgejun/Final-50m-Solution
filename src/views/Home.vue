@@ -25,8 +25,7 @@
 				<!--导航菜单-->
 				<el-menu class="el-menu-vertical-demo" router v-show="!collapsed" id="leftMenus">
 					<template
-						v-for="(item,index) in routes" 
-						v-if="hanleLevel(item)">
+						v-for="(item,index) in routes">
 						<el-submenu :key="index" :index="String(item.meta.id)">
 							<template slot="title">
 								<i :class="item.meta.icon"></i>{{item.meta.name}}
@@ -85,9 +84,6 @@
 			onSubmit() {
 				console.log('submit!');
 			},
-			hanleLevel(item) {
-				return item.meta.requiresAuth;
-			},
 			//退出登录
 			logout: function () {
 				var _this = this;
@@ -110,7 +106,7 @@
 				this.sysUserAvatar = user.avatar || '';
 				this.sysUserLevel = 0;
 			}
-			_this.routes = _this.$router.options.routes;
+			_this.routes = _this.$store.state.routesList;
 		}
 	}
 </script>
