@@ -9,7 +9,7 @@
         <el-form-item label>
           <el-select v-model="buildingStatus.status" placeholder="选择楼栋状态">
             <el-option label="正常" value="1"></el-option>
-            <el-option label="停营" value="0"></el-option>
+            <el-option label="停营" value="2"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -39,9 +39,9 @@
           <el-button size="small" @click="handleMessage(scope.$index, scope.row)">修改</el-button>
           <el-button
             size="small"
-            :type="scope.row.statusId === 5 ? 'warning' : 'success'"
+            :type="scope.row.status === 1 ? 'warning' : 'success'"
             @click="handleStatus(scope.$index, scope.row)"
-          >{{ scope.row.statusId === 5 ? '暂停运营' : '恢复运营' }}</el-button>
+          >{{ scope.row.status === 1 ? '暂停运营' : '恢复运营' }}</el-button>
           <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -56,7 +56,7 @@
         <el-form-item label="运营状态">
           <el-radio-group v-model="addForm.status">
             <el-radio class="radio" :label="1">正常</el-radio>
-            <el-radio class="radio" :label="0">停营</el-radio>
+            <el-radio class="radio" :label="2">停营</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="详细信息">
@@ -89,11 +89,14 @@
 
 <script>
 import util from "../../../common/js/util";
+//获取楼栋接口
+import { searchBuilding, addBuilding, changeBuilding, deleteBuilding } from "../../../api/building_repository";
 export default {
   data() {
     return {
       // 控制表单载入状态
       listLoading: 0,
+      id: '',
       // 模态框控制
       GcLock: {
         change: false
@@ -105,7 +108,7 @@ export default {
         name: "",
         info: "",
         status: 1,
-        storageId: '0',
+        storageId: '',
       },
       addFormRules: {
         name: {
@@ -127,37 +130,10 @@ export default {
       },
 
       // 楼栋列表
-      buildingList: [
-        {
-          id: 0,
-          name: "24栋",
-          info: "具体详情信息",
-          statusId: 5,
-          statusName: '正常',
-          storageId: 6,
-          storageName: '西门一号仓库'
-        },
-        {
-          id: 1,
-          name: "20栋",
-          info: "该公寓紧挨勤工助学中学",
-          statusId: 6,
-          statusName: '停运',
-          storageId: 6,
-          storageName: '燕子超市036仓库'
-        },
-        {
-          id: 2,
-          name: "26栋",
-          info: "具体详情信息",
-          statusId: 5,
-          statusName: '正常',
-          storageId: 6,
-          storageName: '燕子超市02仓'
-        }
-      ],
+      buildingList: [],
       //修改
       changeForm: {
+        id: '',
         name: "",
         info: ""
       }
@@ -167,30 +143,89 @@ export default {
     // 处理楼栋运营状态
     handleStatus(index, row) {
       let _this = this;
-      _this.buildingList[index].status = row.status === 0 ? 1 : 0;
+      changeBuilding(_this, row.id, {
+        status: row.status === 1 ? 2 : 1
+      }).then((res) => {
+        _this.$message({
+            message: "操作成功",
+            type: "success"
+        });
+        searchBuilding(_this);
+      })
     },
     selsChange() {},
     //
     forStatus() {},
     // 处理查询
     handleSeach() {
-      this.listLoading = 1;
-      console.log(this.buildingStatus);
+      let _this = this
+      searchBuilding(_this)
     },
-    // 新增楼栋
+    // 新增楼栋按钮
     openAdd() {
-      this.dialogVisible = true;
+      let _this = this
+      _this.dialogVisible = true
     },
-    //修改
+    // 新增楼栋提交
+    addSubmit() {
+      let _this = this;
+      // 表单验证
+      _this.$refs["addForm"].validate(valid => {
+        if (valid) {
+          _this.$confirm("是否确认提交?", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning"
+          }).then(() => {
+              // 接口调用
+              _this.dialogVisible = false;
+              addBuilding(_this, {
+                name: _this.addForm.name,
+                info: _this.addForm.info,
+                status: _this.addForm.status,
+                storageId: _this.addForm.storageId
+              }).then((res) => {
+                console.log(res)
+                _this.$message({
+                  type: "success",
+                  message: "添加成功!"
+                });
+              })
+            }).catch(() => {
+              
+            });
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    //修改按钮
     handleMessage(index, row) {
       let _this = this;
       _this.GcLock.change = !_this.GcLock.change;
+      _this.changeForm.id = row.id;
       _this.changeForm.name = row.name;
-      _this.changeForm.message = row.message;
+      _this.changeForm.info = row.info;
+    },
+    //修改后的提交按钮
+    changeSubmit() {
+      let _this = this;
+      changeBuilding(_this, _this.changeForm.id, {
+        name: _this.changeForm.name,
+        info: _this.changeForm.info
+      }).then((res) => {
+        _this.$message({
+            message: "操作成功",
+            type: "success"
+        });
+        _this.GcLock.change = !_this.GcLock.change;
+        searchBuilding(_this);
+      })
     },
     //删除
     handleDel(index, row) {
-      let _this = this;
+      let _this = this
       _this
         .$confirm("是否删除 " + row.name + " ？", "提示", {
           confirmButtonText: "确定",
@@ -198,50 +233,19 @@ export default {
           type: "warning"
         })
         .then(() => {
+          deleteBuilding(_this,row.id);
           _this.buildingList.splice(index, 1);
           _this.$message({
             message: "操作成功",
             type: "success"
           });
-        })
-        .catch(() => {
+        }).catch(() => {
           _this.$message({
             message: "已取消",
             type: "success"
           });
         });
     },
-
-    //
-    addSubmit() {
-      // 表单验证
-      this.$refs["addForm"].validate(valid => {
-        if (valid) {
-          this.$confirm("是否确认提交?", "提示", {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            type: "warning"
-          })
-            .then(() => {
-              this.$message({
-                type: "success",
-                message: "添加成功!"
-              });
-              // 接口调用
-              this.dialogVisible = false;
-            })
-            .catch(() => {
-              this.$message({
-                type: "info",
-                message: "已取消"
-              });
-            });
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
-    }
   }
 };
 </script>

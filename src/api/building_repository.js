@@ -1,29 +1,32 @@
 import axios from 'axios';
 
 // 查询楼栋接口
-export const searchBuilding = (params) => { 
-    axios.get(`${base}/api/apartments`, { 
-        params: params 
-    });
+export const searchBuilding = (ev) => { 
+    return ev.$ajax.get(`/api/apartments?name=${ev.buildingStatus.name}`).then((res) => {
+        console.log(res)
+        ev.buildingList = res.data.data.rows
+      }).catch((err) => {
+        console.log(err)
+      });
 }
 
 // 新增楼栋接口
-export const addBuilding = (params) => {
-    axios.post(`${base}/api/apartments`, {
-        params: params
-    });
+export const addBuilding = (ev, data) => {
+    return ev.$ajax.post(`/api/apartments`,data, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
 }
 
 // 更新楼栋信息接口
-export const changeBuilding = (params, id) => {
-    axios.put(`${base}/api/apartments/${id}`, {
-        params: params
-    });
+export const changeBuilding = (ev, id, data) => {
+    return ev.$ajax.put(`/api/apartments/${id}`,data)
 }
 
 // 删除楼栋信息接口
-export const deleteBuilding = (id) => {
-    axios.delete(`${base}/api/aparments/id=${id}`);
+export const deleteBuilding = (ev, id) => {
+    return ev.$ajax.delete(`/api/apartments/${id}`)
 }
 
 // 查询商铺的仓库接口
