@@ -1,6 +1,4 @@
 import axios from 'axios';
-import base  from './baseUrl';
-
 
 // 查询楼栋接口
 export const searchBuilding = (params) => { 

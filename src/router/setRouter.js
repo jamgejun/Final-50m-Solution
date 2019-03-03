@@ -1,5 +1,4 @@
 import Home from '../views/Home.vue';
-import { resolve } from 'url';
 
 export const setRouter = (ev,routerList) => {
     let parentList = routerList.filter((v) => ( v.parentId === 0 ) )
@@ -20,6 +19,9 @@ export const setRouter = (ev,routerList) => {
         }
         for( let j=0; j < childrenList.length; j++ ) {
             if ( parentList[i].id === childrenList[j].parentId ) {
+                let reg = new RegExp('/views')
+                let path = childrenList[j].url.replace(reg, '')
+                console.log(path)
                 preRouter[i].children.push({
                     path: childrenList[j].url,
                     meta: {
@@ -28,7 +30,8 @@ export const setRouter = (ev,routerList) => {
                         icon: childrenList[j].icon,
                         permission: childrenList[j].permission
                     },
-                    component: (resolve) => (require(["@"+childrenList[j].url]+""), resolve)
+                    component: (resolve) => require([`../views${path}.vue`], resolve)
+                    
                 })
             }   
         }
@@ -36,7 +39,9 @@ export const setRouter = (ev,routerList) => {
     for (let k=0 ;k<preRouter.length; k++) {
         ev.$router.options.routes.push(preRouter[k])
     }
+    // 添加路由
     ev.$router.addRoutes(ev.$router.options.routes)
-    console.log(ev.$router.options.routes)
+    // 设置菜单
     ev.$store.dispatch('setRoutes', preRouter);
+    console.log(ev.$store.state.routesList);
 }

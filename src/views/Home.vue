@@ -90,8 +90,8 @@
 				this.$confirm('确认退出吗?', '提示', {
 					type: 'warning'
 				}).then(() => {
-					_this.$store.dispatch('login', '');
-					_this.$router.push('/login');
+					// 刷新整个界面
+					_this.$router.go(0)
 				}).catch(() => {
 				});
 			}
