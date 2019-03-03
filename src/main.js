@@ -2,6 +2,7 @@ import babelpolyfill from 'babel-polyfill'
 import Vue from 'vue'
 import App from './App'
 import axios from 'axios'
+import Message from 'element-ui'
 
 // 使用ElementUI
 import ElementUI from 'element-ui'
@@ -16,7 +17,6 @@ import VueRouter from 'vue-router'
 import mystore from './store'
 import Vuex from 'vuex'
 import routes from './router/admin'
-
 // 声明使用插件
 Vue.use(ElementUI)
 Vue.use(VueRouter)
@@ -43,6 +43,25 @@ axios.defaults.withCredentials = true;
 // // 全局默认设置
 // // 超时时间
 // axios.defaults.timeout = 5000;
+
+axios.interceptors.response.use((response) => {
+    return response
+},(err)=> {
+    if (err && err.response) {
+        switch(err.response.status) {
+            case 400: alert('请求错误！')
+            break
+            case 401: alert('对不起，您目前没有权限，请登录')
+            break
+            case 405: alert('网络请求出错，请查看请求方式')
+            break
+            case 500: alert('服务器出错，请联系系统管理员')
+            break
+            default:
+        }
+    }
+    return Promise.reject(err)
+})
 
 // 对Vue原型链赋值
 Vue.prototype.$ajax = axios;

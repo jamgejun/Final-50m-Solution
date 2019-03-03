@@ -1,30 +1,49 @@
-import axios from 'axios';
+import axios from 'axios'
+import Message from 'element-ui'
 
-let base = '';
+let server = axios.create({
+    baseURL: '/api/',
+    timeout: 5000,
+    withCredentials: true
+})
+// 使用npm run build 的时候， 将上面注释掉  default 路径使用下面的就行
+// server.baseURL = 'http://t159z26789.iask.in/f50m-web/'  //打包部署上线时 
+// server.baseURL = 'http://localhost:8888/f50m-web/'  //打包部署上线时 
 
-export const requestLogin = params => { 
-    return axios.post(`${base}/login`, params).then(res => res.data); 
-};
+// 解决跨域
+// axios.defaults.headers.post["Content-type"]='application/x-www-form-urlencoded';
 
-export const getUserList = params => { return axios.get(`${base}/user/list`, { params: params }); };
+//http request 拦截器
+server.interceptors.request.use(
+    config => {
+      config.headers = {
+        'Content-Type':'application/x-www-form-urlencoded'
+      }
+      return config;
+    },
+    error => {
+      return Promise.reject(err);
+    }
+  );
 
-export const getUserListPage = params => { return axios.get(`${base}/user/listpage`, { params: params }); };
+// response 拦截器
+server.interceptors.response.use((response) => {
+    return response
+},(err)=> {
+    if (err && err.response) {
+        switch(err.response.status) {
+            case 400: Message.error({message: '请求错误！'})
+            break
+            case 401: Message.error({message: '对不起，您目前没有权限，请登录'})
+            break
+            case 405: Message.error({message: '网络请求出错，请查看请求方式'})
+            break
+            case 500: Message.error({message: '服务器出错，请联系系统管理员'})
+            break
+            default:
+        }
+    }
+    return Promise.reject(err)
+})
 
-export const removeUser = params => { return axios.get(`${base}/user/remove`, { params: params }); };
-
-export const batchRemoveUser = params => { return axios.get(`${base}/user/batchremove`, { params: params }); };
-
-export const editUser = params => { return axios.get(`${base}/user/edit`, { params: params }); };
-
-export const addUser = params => { return axios.get(`${base}/user/add`, { params: params }); };
-
-// 用户登录接口
-export const login = params => { return axios.post(`${base}/sys/login`, {params: params }); } 
-// 用户登出接口
-export const logout = params => { return axios.get(`${base}/sys/logout`, {params: params }); }
-// 数据库访问日志接口
-export const syslogs = params => { return axios.get(`${base}/sys/syslogs`, {params: params}); }
-
-
-// 管理楼栋接口
-export const getBuilding = params => { return axios.get(`${base}/building/`, { params: params }); };
+export default server

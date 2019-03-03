@@ -43,5 +43,4 @@ export const setRouter = (ev,routerList) => {
     ev.$router.addRoutes(ev.$router.options.routes)
     // 设置菜单
     ev.$store.dispatch('setRoutes', preRouter);
-    console.log(ev.$store.state.routesList);
 }
