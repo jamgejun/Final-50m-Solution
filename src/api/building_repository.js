@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from 'axios'
 
 // 查询楼栋接口
 export const searchBuilding = (ev) => { 
