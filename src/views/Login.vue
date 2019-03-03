@@ -43,6 +43,7 @@ export default {
                     message: '请输入账号',
                     trigger: 'blur' 
                 },
+                {  max: 20, message: '用户名长度不超过20个字符', trigger: 'blur change' }
                 //{ validator: validaePass }
             ],
             password: [
@@ -106,17 +107,19 @@ export default {
                             _this.$ajax.defaults.headers.common["X-SDX-Token"] = _this.$store.state.userToken;
                             // 获取菜单
                             getMenus(_this).then((res) => {
-                                console.log(res);
                                 let rows = res.data.data.rows
                                 // 将目录存到Vuex中去
                                 _this.$store.dispatch('getMenus', rows);
                                 setRouter(_this, _this.$store.state.permissionList)
+                                _this.$router.push('/');
                             }).catch((err) => {
                                 console.log(err)  
                             })
-                            _this.$router.push('/');
                         }
                     }).catch((err) => {
+                        // 清空数据
+                        _this.$refs['ruleForm2'].resetFields();
+                        _this.logining = false;
                         console.log(err)
                     })
                 }
