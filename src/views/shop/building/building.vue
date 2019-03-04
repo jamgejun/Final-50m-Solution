@@ -13,7 +13,7 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSeach">查询</el-button>
+          <el-button type="primary" @click="handleSearch">查询</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click.native.prevent="openAdd">新增楼栋</el-button>
@@ -157,7 +157,7 @@ export default {
     //
     forStatus() {},
     // 处理查询
-    handleSeach() {
+    handleSearch() {
       let _this = this
       searchBuilding(_this)
     },
