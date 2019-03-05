@@ -51,7 +51,10 @@ axios.interceptors.response.use((response) => {
         switch(err.response.status) {
             case 400: alert('请求错误！')
             break
-            case 401: alert('对不起，您目前没有权限，请登录')
+            case 401: () => { 
+                alert('对不起，您目前没有权限，请登录') 
+                router.go(0)
+            }
             break
             case 405: alert('网络请求出错，请查看请求方式')
             break

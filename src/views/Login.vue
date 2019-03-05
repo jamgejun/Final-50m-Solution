@@ -104,6 +104,17 @@ export default {
                             clearInterval(_this.Timer)
                             // 设置token值。
                             _this.$store.dispatch('login', res.data.data.token);
+
+                            // 设置过期事件
+                            setTimeout(() => {
+                                _this.$message({
+                                    message: '您的身份信息已过期，请重新登录',
+                                    type: 'warning'
+                                })
+                                setTimeout(() => {
+                                    _this.$router.go(0)
+                                }, res.data.data.expire + 1000)
+                            }, res.data.data.expire)
                             _this.$ajax.defaults.headers.common["X-SDX-Token"] = _this.$store.state.userToken;
                             // 获取菜单
                             getMenus(_this).then((res) => {
@@ -111,7 +122,10 @@ export default {
                                 // 将目录存到Vuex中去
                                 _this.$store.dispatch('getMenus', rows);
                                 setRouter(_this, _this.$store.state.permissionList)
-                                _this.$router.push('/');
+                                // 默认跳转到位于菜单第一项的界面
+                                _this.$router.push({
+                                    path: _this.$store.state.routesList[0].children[0].path
+                                });
                             }).catch((err) => {
                                 console.log(err)  
                             })

@@ -23,7 +23,7 @@
 		<el-col :span="24" class="main">
 			<aside :class="collapsed?'menu-collapsed':'menu-expanded'">
 				<!--导航菜单-->
-				<el-menu class="el-menu-vertical-demo" router v-show="!collapsed" id="leftMenus">
+				<el-menu class="el-menu-vertical-demo" router default-active='1' id="leftMenus">
 					<template
 						v-for="(item,index) in routes">
 						<el-submenu :key="index" :index="String(item.meta.id)">
