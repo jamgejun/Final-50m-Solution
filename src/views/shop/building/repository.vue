@@ -165,6 +165,10 @@ export default {
       RpList: []
     };
   },
+  mounted: function () {
+  let _this = this;
+    getRepository(_this)
+  },
   methods: {
     // 搜索工具栏
 
@@ -178,6 +182,15 @@ export default {
       let _this = this;
       _this.SwitchLock.addStatus = true;
     },
+    mounted: function () {
+    let _this = this;
+      getRepository(_this).then((res) => {
+        console.log(res)
+        _this.RpList = res.data.data.rows
+      }).catch((err) => {
+        console.log(err)
+      });
+   },
     //新增仓库提交后的按钮
     addSubmit() {
       let _this = this;
