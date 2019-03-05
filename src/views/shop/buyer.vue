@@ -35,6 +35,8 @@
 </template>
 
 <script>
+import { searchBuyer } from "../../api/buyer";
+import util from "../../common/js/util";
 export default {
     data() {
         return {
@@ -49,30 +51,34 @@ export default {
                 phone: '',
                 duringTime: ''
             },
-            buyerList: [
-                {
-                    name: '飞翔的鱼',
-                    trueName: '李四',
-                    phone: '123456',
-                    joinTime: '2019-9-1'
-                },
-                {
-                    name: '白云',
-                    trueName: '王四',
-                    phone: '123456',
-                    joinTime: '2018-9-1'
-                },
-                {
-                    name: '跳动的心',
-                    trueName: '张三',
-                    phone: '123456',
-                    joinTime: '2019-5-1'
-                }
-            ]
+            buyerList: []
         }
     },
+    mounted: function () {
+        let _this = this;
+        searchBuyer(_this).then((res) => {
+            console.log(res)
+            _this.buyerList = res.data.data.rows
+        }).catch((err) => {
+            console.log(err)
+        });
+    },
     methods: {
-        handleSeach() {}
+        //处理查询
+        handleSeach() {
+            let _this = this
+            searchBuyer(_this,{
+                name:_this.buyerSearch.name,
+                trueName:_this.buyerSearch.trueName,
+                phone:_this.buyerSearch.phone,
+                joinTime:_this.buyerSearch.joinTime
+            }).then((res) => {
+                console.log(res)
+                _this.buyerList = res.data.data.rows
+            }).catch((err) => {
+                console.log(err)
+            });
+        }
     }
 }
 </script>
