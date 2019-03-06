@@ -36,7 +36,11 @@ export const updateGoods = (ev, id, data) => {
 }
 
 export const addGoods = (ev, data) => {
-    return ev.$ajax.post(`/api/goodss`, data)
+    return ev.$ajax.post(`/api/goodss`, data, {
+        headers: {
+            'Content-Type': 'application/json; multipart/form-data'
+        }
+    })
 }
 
 export const goodspictures = (ev, data) => {
