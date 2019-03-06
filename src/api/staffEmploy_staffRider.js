@@ -8,7 +8,7 @@ export const searchRider = (ev, data) => {
 }
 
 export const referRider = (ev, data) => {
-    return ev.$ajax.get(`/sys/users`, {
+    return ev.$ajax.get(`/sys/users?type=${31}`, {
         params: data
     })
 }
