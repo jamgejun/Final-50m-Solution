@@ -18,7 +18,6 @@
                 </el-form-item>
                 <el-form-item label="二级分类名：">
                     <el-select v-model="GmSearch.secondCategory" placeholder="选择二级分类" :disabled="true">
-
                     </el-select>
                 </el-form-item>
                 <el-form-item label="商品状态：">
@@ -36,136 +35,47 @@
             </el-form>
         </el-col>
 
-        <el-table :data="goodsList">
-            <el-table-column type="selection" width="36"></el-table-column>
-            <el-table-column prop="name" label="商品名" align="center" width="100"></el-table-column>
-            <el-table-column prop="count" label="库存" align="center" width="100"></el-table-column>
-            <el-table-column prop="salePrice" label="卖价" align="center" width="100"></el-table-column>
-            <el-table-column prop="orignPrice" label="原价" align="center" width="100"></el-table-column>
-            <el-table-column prop="status" label="状态" align="center" width="100">
-                <template slot-scope="scope">
-                    {{ handleStatus(scope.row.status) }}
-                </template>
-            </el-table-column>
-            <el-table-column prop="introduce" label="商品简介" align="center" width="100"></el-table-column>
-            <el-table-column prop="moreIntroduce" width="120" label="商品更多介绍" sorttable></el-table-column>
-            <el-table-column label="操作" min-width="120" align="left">
-                <template slot-scope="scope">
-                    <el-button size="small" @click="handleUp(scope.row)">{{ scope.row.status===0 ?'上架':'下架' }}</el-button>
-                    <el-button size="small" v-if="scope.row.status===1" @click="handleChangePrice(scope.$index, scope.row)">补货/调价</el-button>
-                    <el-button size="small" @click="handleChange(scope.$index, scope.row)">修改</el-button>
-                    <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-
+        <div>
+            <el-table :data="goodsList"  v-loading = "loading">
+                <el-table-column type="selection" width="36"></el-table-column>
+                <el-table-column prop="name" label="商品名称" align="center" width="100"></el-table-column>
+                <el-table-column prop="sellPrice" label="卖价" align="center" width="80"></el-table-column>
+                <el-table-column prop="originalPrice" label="原价" align="center" width="80"></el-table-column>
+                <el-table-column prop="statusName" label="状态" align="center" width="120"></el-table-column>
+                <el-table-column prop="goodsInfo" label="商品简介" align="center" width="150"></el-table-column>
+                <el-table-column prop="moreInfo" label="商品更多介绍" width="180"></el-table-column>
+                <el-table-column label="商品图片" width="200">
+                    <template slot-scope="scope">
+                        <img class="goodsImg" :src="scope.row.gooodsSymboPic" alt="">
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" min-width="150" align="left">
+                    <template slot-scope="scope">
+                        <el-button size="small" @click="handleUp(scope.row)">{{ scope.row.status===0 ?'上架':'下架' }}</el-button>
+                        <el-button size="small" v-if="scope.row.status===1" @click="handleChangePrice(scope.$index, scope.row)">补货/调价</el-button>
+                        <el-button size="small" @click="handleChange(scope.$index, scope.row)">修改</el-button>
+                        <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <!-- <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="currentPage4"
+                :page-sizes="[100, 200, 300, 400]"
+                :page-size="100"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="400">
+            </el-pagination> -->
+        </div>
         <!-- 新增商品 -->
         <el-dialog title="新增商品" :visible.sync="GmLock.addGoods" :close-on-click-model="false" min-width="60vw" ref="addForm">
-            <el-form :model="addForm" :rules="formRules" ref="addForm" status-icon :inline="true">
-                <el-form-item label="商品名" prop="name">
-                    <el-input v-model="addForm.name" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="商品状态" prop="status">
-                    <el-select v-model="addForm.status" placeholder="选择商品状态">
-                        <el-option label="正常" value="1"></el-option>
-                        <el-option label="异常" value="0"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="卖价" prop="salePrice">
-                    <el-input v-model="addForm.salePrice" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="原价" prop="orignPrice">
-                    <el-input v-model="addForm.orignPrice" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="是否热门" prop="iShot">
-                    <el-select v-model="addForm.iShot" placeholder="选择显示序号">
-                        <el-option value="0" label="是"></el-option>
-                        <el-option value="1" label="否"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="库存数量" prop="count">
-                    <el-input v-model="addForm.count" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="商品简介" prop="introduce">
-                    <el-input type="textarea" v-model="addForm.introduce" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="商品更多介绍" prop="moreIntroduce">
-                    <el-input type="textarea" v-model="addForm.moreIntroduce" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-upload
-                    class="upload-demo"
-                    action="https://jsonplaceholder.typicode.com/posts/"
-                    :on-preview="handlePreview"
-                    :on-remove="handleRemove"
-                    :file-list="fileList2"
-                    list-type="picture"
-                    style="margin-bottom:20px">
-                    <el-button size="small" type="primary">点击上传</el-button>
-                    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-                </el-upload>
-            </el-form>
-            <div slot="footer" class="dialog-footer" style="margin-top:20x;">
-                <el-button @click.native="cancer('addGoods', 'addForm')">取消</el-button>
-                <el-button type="primary" @click.native="addSubmit('addForm')">提交</el-button>
-            </div>
+            <add-form @close='close'></add-form>
         </el-dialog>
 
         <!-- 修改 -->
-        <el-dialog title="修改商品" :visible.sync="GmLock.change" :close-on-click-model="false" min-width="60vw">
-           <el-form v-model="changeForm">
-                <el-form :inline="true">
-                    <el-form-item label="商品名">
-                        <el-input v-model="changeForm.name" auto-complete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="商品状态">
-                        <el-select v-model="changeForm.status" placeholder="选择商品状态">
-                            <el-option label="正常" value="1"></el-option>
-                            <el-option label="异常" value="0"></el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-form>
-                <el-form :inline="true">
-                    <el-form-item label="卖价">
-                        <el-input v-model="changeForm.salePrice" auto-complete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="原价">
-                        <el-input v-model="changeForm.orignPrice" auto-complete="off"></el-input>
-                    </el-form-item>
-                </el-form>
-                <el-form :inline="true">
-                    <el-form-item label="是否热门">
-                        <el-select v-model="changeForm.iShot" placeholder="选择显示序号">
-                            <el-option value="0" label="是"></el-option>
-                            <el-option value="1" label="否"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="库存数量">
-                        <el-input v-model="changeForm.count" auto-complete="off"></el-input>
-                    </el-form-item>
-                </el-form>
-                <el-form-item label="商品简介">
-                    <el-input type="textarea" v-model="changeForm.introduce" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="商品更多介绍">
-                    <el-input type="textarea" v-model="changeForm.moreIntroduce" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-upload
-                    
-                    class="upload-demo"
-                    action="https://jsonplaceholder.typicode.com/posts/"
-                    :on-preview="handlePreview"
-                    :on-remove="handleRemove"
-                    :file-list="fileList2"
-                    list-type="picture"
-                    style="margin-bottom:20px">
-                    <el-button size="small" type="primary">点击上传</el-button>
-                    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-                </el-upload>
-            </el-form>
-            <div slot="footer" class="dialog-footer" style="margin-top:20x;">
-                <el-button @click.native="GmLock.change = false">取消</el-button>
-                <el-button type="primary" @click.native="changeSubmit">提交</el-button>
-            </div>
+        <el-dialog title="修改商品" :visible.sync="GmLock.change" :close-on-click-model="false" >
+            <change-form :changeForm="changeForm"></change-form>
         </el-dialog>
 
         <!-- 补货/调价商品 -->
@@ -190,10 +100,18 @@
 </template>
 
 <script>
+import { getGoods, getOneGoods, updateGoods } from '../../../api/goods/goods.js'
+import addForm from './components/add.vue'
+import changeForm from './components/change.vue'
 export default {
+    components: {
+        addForm,
+        changeForm
+    },
     data() {
         return {
             // 模态框控制
+            loading: false,
             GmLock: {
                 addGoods: false,
                 change: false,
@@ -226,18 +144,6 @@ export default {
                     index: 4
                 },
             ],
-            // 新增
-            addForm: {
-                name: '',
-                photo: '',
-                introduce: '',
-                moreIntroduce: '',
-                salePrice: '',
-                orignPrice: '',
-                count: '',
-                iShot: '',
-                status: '',
-            },
             formRules: {
                 name: [
                     {
@@ -306,74 +212,45 @@ export default {
                     }
                 ]
             },
-            changeForm: {
-                name: '',
-                photo: '',
-                introduce: '',
-                moreIntroduce: '',
-                salePrice: '',
-                orignPrice: '',
-                count: '',
-                iShot: '',
-                status: '',
-            },
+            changeForm: {},
             goodsList: [
                 {
-                    name: '方便面',
-                    photo: '',
-                    introduce: '麻辣鲜香',
-                    moreIntroduce: '吃了还想吃',
-                    salePrice: 4.5,
-                    orignPrice: 5,
-                    count: 100,
-                    iShot: 0,
-                    status: 0,
-                },
-                {
-                    name: '奥利奥',
-                    photo: '',
-                    introduce: '泡一泡 ',
-                    moreIntroduce: '更多',
-                    salePrice: 10,
-                    orignPrice: 11,
-                    count: 150,
-                    iShot: 1,
-                    status: 1,
-                },
-                {
-                    name: '三只松鼠',
-                    photo: '',
-                    introduce: '互联网坚果销量领先品牌',
-                    moreIntroduce: '买了才知道',
-                    salePrice: 12,
-                    orignPrice: 15,
-                    count: 200,
-                    iShot: 0,
-                    status: 0
-                },
-                {
-                    name: '鸭脖',
-                    photo: '',
-                    introduce: '麻辣',
-                    moreIntroduce: '',
-                    salePrice: 6,
-                    orignPrice: 8,
-                    count: 400,
-                    iShot: 1,
-                    status: 1,
-                },
+                    id: '商品ID',
+                    name: '商品名称',
+                    status: '商品状态',
+                    statusName: '商品状态名',
+                    sellPrice: '商品现价',
+                    orginalPrice: '商品原价',
+                    goodsInfo: '商品信息',
+                    moreInfo: '商品更多介绍',
+                    gooodsSymboPic: '商品默认图片'
+                }
             ]
         }
     },
+    mounted: function  () {
+        let _this = this
+        _this.loading = true
+        getGoods(_this).then((res) => {
+            _this.goodsList = res.data.data.rows
+            _this.loading = false
+        })
+    },
     methods: {
+        handleCurrentChange(val) {
+            console.log(`当前页: ${val}`);
+        },
         handleSeach() {
-            alert('查询成功')
         },
         handleAdd() {
             let _this = this;
             for(let i in _this.addForm) {
                _this.addForm[i] = ''
             }
+            _this.GmLock.addGoods = !_this.GmLock.addGoods;
+        },
+        close() {
+            let _this = this;
             _this.GmLock.addGoods = !_this.GmLock.addGoods;
         },
         cancer(lock, formName) {
@@ -429,7 +306,22 @@ export default {
         handleChange(index, row) {
             let _this = this;
             _this.GmLock.change = !_this.GmLock.change;
-            _this.changeForm = row;
+            _this.changeForm = {}
+            getOneGoods(_this, row.id).then((res) => {
+                _this.changeForm = res.data.data
+            })
+        },
+        updateSubmit() {
+            let _this = this;
+            _this.$confirm("是否确认提交?", "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning"
+            }).then(() => {
+                updateGoods(_this, _this.changeForm.id, _this.changeForm).then((res) => {
+                    console.log(res);
+                })
+            })
         },
         handleDelete(index, row) {
             let _this = this;
@@ -439,6 +331,20 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+    .goodsImg {
+        width: 50px;
+        height: 50px; 
+        margin-top: 10px;
+        margin-bottom: 10px;
+        vertical-align: middle;
+    }
+    .el-dialog--small {
+        width: 70%;
+    }
+    .pagination {
+        margin-top: 20px;
+        float: right;
+        margin-right: 20px;
+    }
 </style>

@@ -10,7 +10,7 @@
                     <el-button type="primary" @click="handleSeach">查询</el-button>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="handleAdd">新增分类</el-button>
+                    <el-button type="primary" @click="handleAdd">新增一级分类</el-button>
                 </el-form-item> 
             </el-form>
         </el-col>
@@ -18,13 +18,9 @@
         <el-table :data="GcList">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="name" label="分类名" align="center" width="120"></el-table-column>
-            <el-table-column prop="index" width="120" label="显示顺序号" sorttable></el-table-column>
-            <el-table-column prop="status" label="显示状态" align="center" width="200">
-                <template slot-scope="scope">
-                    {{ handleStatus(scope.row.status) }}
-                </template>
-            </el-table-column>
-            <el-table-column prop="SecondLists" label="操作" min-width="200" align="center">
+            <el-table-column prop="displayIndex" width="120" label="显示顺序号" sorttable></el-table-column>
+            <el-table-column prop="displayTypeName" label="显示状态" align="center" width="200"></el-table-column>
+            <el-table-column label="操作" min-width="200" align="center">
                 <template slot-scope="scope">
                     <el-button size="small" @click="handleChange(scope.$index, scope.row)">修改</el-button>
                     <el-button size="small" @click="handleSecond(scope.$index, scope.row)">维护二级分类</el-button>
@@ -32,15 +28,19 @@
                 </template>
             </el-table-column>
         </el-table>
-
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="1000">
+        </el-pagination>
         <!-- 新增分类 -->
         <el-dialog title="新增分类" :visible.sync="GcLock.addCategory" :close-on-click-model="false">
             <el-form :data="addForm" label-width="100px" ref="addForm">
                 <el-form-item label="分类名">
                     <el-input v-model="addForm.name" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="显示顺序号">
-                    <el-select v-model="addForm.index" placeholder="选择显示序号">
+                <el-form-item label="显示顺序">
+                    <el-select v-model="addForm.displayIndex" placeholder="选择显示序号">
                         <el-option 
                             v-for="CategoryIndex in CategoryIndexs"
                             :key="CategoryIndex.value"
@@ -49,11 +49,11 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="显示状态">
-                    <el-select v-model="addForm.status" placeholder="选择显示状态">
-                        <el-option label="关闭" value="0"></el-option>
-                        <el-option label="显示在首页" value="1"></el-option>
-                        <el-option label="显示在分页" value="2"></el-option>
+                <el-form-item label="显示类型">
+                    <el-select v-model="addForm.displayType" placeholder="选择显示分类">
+                        <el-option label="停用分类" value="36"></el-option>
+                        <el-option label="普通分类" value="37"></el-option>
+                        <el-option label="首页分类" value="38"></el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -69,8 +69,8 @@
                 <el-form-item label="分类名">
                     <el-input v-model="changeForm.name" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="显示顺序号">
-                    <el-select v-model="changeForm.index" placeholder="选择显示序号">
+                <el-form-item label="显示顺序">
+                    <el-select v-model="changeForm.displayIndex" placeholder="选择显示序号">
                         <el-option 
                             v-for="CategoryIndex in CategoryIndexs"
                             :key="CategoryIndex.value"
@@ -79,11 +79,11 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="显示状态">
-                    <el-select v-model="changeForm.status" placeholder="选择显示状态">
-                        <el-option label="关闭" value="0"></el-option>
-                        <el-option label="显示在首页" value="1"></el-option>
-                        <el-option label="显示在分页" value="2"></el-option>
+                <el-form-item label="显示类型">
+                    <el-select v-model="changeForm.displayType" placeholder="选择显示状态">
+                        <el-option label="停用分类" value="36"></el-option>
+                        <el-option label="普通分类" value="37"></el-option>
+                        <el-option label="首页分类" value="38"></el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -101,10 +101,19 @@
 </template>
 
 <script>
+import { getGoodsTypes, addGoodsTypes, updateGoodsTypes, deleteGoodsTypes } from '../../../api/goods/category.js'
 import secondCategory from "./secondCategory.vue"
 export default {
     components: {
         secondCategory
+    },
+    created: function () {
+        let _this = this;
+        getGoodsTypes(_this, {
+            parentId:0
+        }).then((res) => {
+            _this.GcList = res.data.data.rows
+        })
     },
     data() {
         return {
@@ -121,8 +130,9 @@ export default {
             // 新增
             addForm: {
                 name: '',
-                index: '',
-                status: ''
+                parentId: '',
+                displayIndex: '',
+                displayType: ''
             },
             CategoryIndexs: [
                 {
@@ -142,80 +152,13 @@ export default {
 
             },
             changeForm: {
+                id: '',
                 name: '',
-                index: '',
-                status: ''
+                parentId: '',
+                displayIndex: '',
+                displayType: ''
             },
-            GcList: [
-                {
-                    name: '零食',
-                    index: 5,
-                    status: 0,
-                    SecondLists: [
-                        {
-                            name: '小吃类',
-                            index: 1
-                        },
-                        {
-                            name: '辣条类',
-                            index: 2
-                        },
-                        {
-                            name: '水果类',
-                            index: 3
-                        },
-                    ]
-                },
-                {
-                    name: '果蔬',
-                    index: 4,
-                    status: 2,
-                    SecondLists: [
-                        {
-                            name: '辣条类',
-                            index: 2
-                        },
-                        {
-                            name: '水果类',
-                            index: 3
-                        },
-                    ]
-                },
-                {
-                    name: '生鲜',
-                    index: 3,
-                    status: 1,
-                    SecondLists: [
-                        {
-                            name: '小吃类',
-                            index: 1
-                        },
-                        {
-                            name: '辣条类',
-                            index: 2
-                        }
-                    ]
-                },
-                {
-                    name: '零食',
-                    index: 2,
-                    status: 1,
-                    SecondLists: [
-                        {
-                            name: '小吃类',
-                            index: 1
-                        },
-                        {
-                            name: '辣条类',
-                            index: 2
-                        },
-                        {
-                            name: '水果类',
-                            index: 3
-                        },
-                    ]
-                }
-            ],
+            GcList: [],
             SecondLists: [
                 
             ]
@@ -223,40 +166,60 @@ export default {
     },
     methods: {
         handleSeach() {
-            console.log(this.GcSearch.name);
-            alert('查询成功')
+            let _this = this;
+            getGoodsTypes(_this, {
+                parentId: 0,
+                name: _this.GcSearch.name
+            }).then((res) => {
+                _this.GcList = res.data.data.rows
+            })
         },
         handleAdd() {
             let _this = this;
             _this.GcLock.addCategory = !_this.GcLock.addCategory
         },
         addSubmit() {
-            console.log(addForm);
+            let _this = this;
+            addGoodsTypes(_this, {
+                name: _this.addForm.name,
+                parentId: 0,
+                displayIndex: _this.addForm.displayIndex,
+                displayType: _this.addForm.displayType
+            }).then((res) => {
+                console.log(res)
+            })
         },
-
-        handleStatus(status) {
-            if (status===0) {
-                return '关闭'
-            } else if (status===1) {
-                return '显示在首页'
-            } else if (status===2) {
-                return '显示在分页'
-            } else {
-                return ''
-            }
+        changeSubmit() {
+            let _this = this;
+            updateGoodsTypes(_this, _this.changeForm.id, {
+                name: _this.changeForm.name,
+                parentId: 0,
+                displayIndex: _this.changeForm.displayIndex,
+                displayType: _this.changeForm.displayType
+            }).then((res)=> {
+                
+            })
         },
         handleChange(index, row) {
             let _this = this;
             _this.GcLock.change = !_this.GcLock.change;
+            _this.changeForm.id = row.id
             _this.changeForm.name = row.name;
-            _this.changeForm.index = row.index;
-            _this.changeForm.status = _this.handleStatus(row.status);
+            _this.changeForm.displayIndex = row.displayIndex;
         },
         handleSecond(index, row) {
             console.log(row);
             let _this = this;
             _this.GcLock.manageSecond = !_this.GcLock.manageSecond;
             _this.SecondLists = row.SecondLists;
+        },
+        handleDelete(index, row) {
+            let _this = this;
+            deleteGoodsTypes(_this, row.id, {
+                parentId: 0
+            }).then((res) => {
+                console.log(res)
+            })
         }
     }
 }

@@ -139,6 +139,15 @@ export default {
       }
     };
   },
+  mounted: function () {
+  let _this = this;
+    searchBuilding(_this).then((res) => {
+      console.log(res)
+      _this.BuildingList = res.data.data.rows
+    }).catch((err) => {
+      console.log(err)
+    });
+  },
   methods: {
     // 处理楼栋运营状态
     handleStatus(index, row) {
@@ -159,7 +168,15 @@ export default {
     // 处理查询
     handleSearch() {
       let _this = this
-      searchBuilding(_this)
+      searchBuilding(_this,{
+        name:_this.buildingStatus.name,
+        status:_this.buildingStatus.status
+      }).then((res) => {
+        console.log(res)
+        ev.buildingList = res.data.data.rows
+      }).catch((err) => {
+        console.log(err)
+      });
     },
     // 新增楼栋按钮
     openAdd() {

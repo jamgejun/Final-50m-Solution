@@ -1,4 +1,5 @@
 import Home from '../views/Home.vue';
+import { debug } from 'util';
 
 export const setRouter = (ev,routerList) => {
     let parentList = routerList.filter((v) => ( v.parentId === 0 ) )
@@ -21,7 +22,6 @@ export const setRouter = (ev,routerList) => {
             if ( parentList[i].id === childrenList[j].parentId ) {
                 let reg = new RegExp('/views')
                 let path = childrenList[j].url.replace(reg, '')
-                console.log(path)
                 preRouter[i].children.push({
                     path: childrenList[j].url,
                     meta: {
@@ -36,6 +36,22 @@ export const setRouter = (ev,routerList) => {
             }   
         }
     }
+    // 使用冒泡排序，将菜单进行排序
+    (() => {
+        let len = preRouter.length
+        let minIndex, temp
+        for (let l = 0 ; l<len ; l++) {
+            minIndex = l;
+            for (let n = l + 1 ; n < len; n++) {
+                if (preRouter[n].meta.indexNum < preRouter[minIndex].meta.indexNum) {
+                    minIndex = n // 保存最小数据项
+                }
+            }
+            temp = preRouter[l];
+            preRouter[l] = preRouter[minIndex]
+            preRouter[minIndex] = temp
+        }
+    })();
     for (let k=0 ;k<preRouter.length; k++) {
         ev.$router.options.routes.push(preRouter[k])
     }
