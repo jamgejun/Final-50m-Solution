@@ -26,3 +26,12 @@ export const login = (ev, data) => {
 export const getMenus = (ev) => {
     return ev.$ajax.get('/sys/menus')
 }
+
+// 获取字典表
+export const getDictorys = (ev, id) => {
+    return ev.$ajax.get(`/dictorys?pId=${id}`, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    })
+}

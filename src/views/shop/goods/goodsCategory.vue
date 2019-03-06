@@ -102,6 +102,7 @@
 
 <script>
 import { getGoodsTypes, addGoodsTypes, updateGoodsTypes, deleteGoodsTypes } from '../../../api/goods/category.js'
+import { getDictorys } from '../../../api/dictorys/dictorys.js'
 import secondCategory from "./secondCategory.vue"
 export default {
     components: {
@@ -113,6 +114,9 @@ export default {
             parentId:0
         }).then((res) => {
             _this.GcList = res.data.data.rows
+        })
+        getDictorys(_this).then((res) => {
+            console.log(res)
         })
     },
     data() {

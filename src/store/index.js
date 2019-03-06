@@ -4,8 +4,8 @@ export default {
     state: {
         userToken:'',
         permissionList: [],
-        sessionTimeOut: 60,
-        routesList: []
+        routesList: [],
+        dictorys: {}
     },
     getters: {
         getToken: () => {
@@ -27,14 +27,8 @@ export default {
         SET_ROUTES(state, routesList) {
             state.routesList = routesList;
         },
-        SET_SESSION(state, ev) {
-            state.userToken = ''
-            sessionStorage.removeItem('token')
-            ev.$message({
-                message: '登录已过期，请重新登录！',
-                type: 'warning'
-            })
-            ev.$router.push('/login')
+        SET_DICTORYS(state, dictorys) {
+            state.dictorys = dictorys
         }
     },
     actions: {
@@ -49,6 +43,9 @@ export default {
         },
         setRoutes({commit}, routesList) {
             commit('SET_ROUTES', routesList)
+        },
+        setDictorys({commit}, dictorys) {
+            commit('SET_DICTORYS', dictorys)
         }
     }
 }

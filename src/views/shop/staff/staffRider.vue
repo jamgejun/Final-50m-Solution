@@ -39,11 +39,7 @@
             <el-table-column prop="jionTime" label="加入时间" align="center" width="120" sortable></el-table-column>
             <el-table-column prop="realName" label="骑手姓名" align="center" width="120"></el-table-column>
             <el-table-column prop="phone" label="骑手手机号" align="center" width="120"></el-table-column>
-            <el-table-column label="服务楼栋" align="center" width="120">
-                <template slot-scope="scope">
-                    {{  scope.row.apartmentId }}
-                </template>
-            </el-table-column>
+            <el-table-column prop="apartmentId" label="服务楼栋" align="center" width="120"></el-table-column>
             <el-table-column prop="positionStatus" label="是否在职" align="center" width="120">
                 <template slot-scope="scope">
                     {{ scope.row.positionStatus === 10 ? '正常' : '暂停' }}
@@ -201,30 +197,33 @@ export default {
             RiderList: []
         }
     },
+    mounted: function () {
+        let _this = this
+        referRider(_this).then((res) => {
+            let RiderList = res.data.data.rows
+            _this.RiderList = res.data.data.rows
+            searchRider(_this, {
+                apartmentId:_this.Ridersearch.apartmentId,
+                positionStatus:_this.Ridersearch.positionStatus
+            }).then((res) => {
+                for (let i = 0; i<RiderList.length; i++) {
+                    for (let k = 0; k<res.data.data.rows.length; k++) {
+                        if (RiderList[i].id === res.data.data.rows[k].riderId) {
+                            RiderList[i].apartmentId = res.data.data.rows[k].apartmentId
+                        } else {
+                            RiderList[i].apartmentId = ''
+                        }
+                    }
+                }
+                    _this.RiderList = RiderList
+            }).catch((err) => {
+                console.log(err)
+            });  
+        })
+    },
     methods: {
         handleSearch() {
-            let _this = this
-                referRider(_this).then((res) => {
-                    let RiderList = res.data.data.rows
-                    _this.RiderList = res.data.data.rows
-                    searchRider(_this, {
-                        apartmentId:_this.Ridersearch.apartmentId,
-                        positionStatus:_this.Ridersearch.positionStatus
-                    }).then((res) => {
-                        for (let i = 0; i<RiderList.length; i++) {
-                            for (let k = 0; k<res.data.data.rows.length; k++) {
-                                if (RiderList[i].id === res.data.data.rows[k].riderId) {
-                                    RiderList[i].apartmentId = res.data.data.rows[k].apartmentId
-                                } else {
-                                    RiderList[i].apartmentId = ''
-                                }
-                            }
-                        }
-                         _this.RiderList = RiderList
-                    }).catch((err) => {
-                        console.log(err)
-                    });  
-                })
+            
         },
         handleAdd() {
             let _this = this; 

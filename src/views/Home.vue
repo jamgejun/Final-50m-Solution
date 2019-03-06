@@ -59,7 +59,15 @@
 </template>
 
 <script>
+import { getDictorys } from '../api/login.js'
 	export default {
+		mounted: function () {
+			let _this = this;
+			getDictorys(_this, ).then((res) => {
+				let dictorys = res.data.da
+				_this.$store.dispatch('setDictorys', dictorys);
+			})
+		},
 		data() {
 			return {
 				sysName:'Final-50m-Solution',

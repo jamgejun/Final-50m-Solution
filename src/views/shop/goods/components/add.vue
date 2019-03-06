@@ -64,9 +64,10 @@
             <el-form :inline="true">
                 <el-form-item label="选择图片" label-width="80">
                     <el-upload
-                        action="/api/goodss"
+                        action=""
                         list-type="picture-card"
                         :on-preview="handlePictureCardPreview"
+                        :before-upload="beforeAvatarUpload"
                         :on-remove="handleRemove">
                         <i class="el-icon-plus"></i>
                     </el-upload>
@@ -102,7 +103,7 @@ export default {
                 displayIndex: 2,
                 isHot: 1,
                 goodsInfo: '',
-                pictures: ['http:/baidu.com/']
+                pictures: []
             },
             formRules: {},
             dialogImageUrl: '',
@@ -110,6 +111,12 @@ export default {
         }
     },
     methods: {
+        beforeAvatarUpload(file) {
+            let _this = this
+            console.log(file);
+            _this.addForm.pictures.push(file);
+            console.log(_this.addForm)
+        },
         close() {
             let _this = this;
             _this.$emit('close' )
