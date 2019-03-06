@@ -75,7 +75,7 @@
         <el-form-item label="楼栋名">
           <el-input v-model="changeForm.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="楼栋名">
+        <el-form-item label="楼栋详情">
           <el-input v-model="changeForm.info" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
@@ -173,7 +173,7 @@ export default {
         status:_this.buildingStatus.status
       }).then((res) => {
         console.log(res)
-        ev.buildingList = res.data.data.rows
+        _this.buildingList = res.data.data.rows
       }).catch((err) => {
         console.log(err)
       });

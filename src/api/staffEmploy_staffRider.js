@@ -8,9 +8,7 @@ export const searchRider = (ev, data) => {
 }
 
 export const referRider = (ev, data) => {
-    return ev.$ajax.get(`/sys/users?type=${31}`, {
-        params: data
-    })
+    return ev.$ajax.get(`/sys/users?type=${31}`)
 }
 
 //新增骑手接口
@@ -18,9 +16,17 @@ export const addRider = (ev, data) => {
     return ev.$ajax.post(`/api/riderworks`, data)
 }
 
+export const newRider = (ev, data) => {
+    return ev.$ajax.post(`/sys/users`, data)
+}
+
 //更新骑手接口
 export const changeRider =(ev, id, data) => {
-    return ev.$ajax.put(`/api/riderworks/${id}`,data)
+    return ev.$ajax.put(`/api/riderworks/${id}`, data)
+}
+
+export const updateRider =(ev, id, data) => {
+    return ev.$ajax.put(`/sys/users/${id}`, data)
 }
 
 //删除骑手接口
