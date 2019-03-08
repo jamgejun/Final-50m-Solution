@@ -1,18 +1,18 @@
 <template> 
   <section>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="订单维度" name="orderDimension">
-        <!--待认领订单维度-->
-        <el-table :data="order"> 
-          <el-table-column prop="number" label="订单编号" style="width: 25%;" sortable></el-table-column>
-          <el-table-column prop="money" label="订单金额" style="width: 10%;"></el-table-column> 
-          <el-table-column prop="building" label="订单楼栋" style="width: 10%;"></el-table-column>
-          <el-table-column prop="goods" label="商品件数" style="width: 5%;"></el-table-column> 
-          <el-table-column prop="time" label="下单时间" style="width: 20%;" sortable></el-table-column> 
-          <el-table-column prop="riderName" label="配送骑手姓名" style="width: 10%;"></el-table-column>
-          <el-table-column prop="riderPhone" label="骑手手机号" style="width: 20%;"></el-table-column>
-        </el-table>
-      </el-tab-pane>
+        <el-tab-pane label="订单维度" name="orderDimension">
+            <!--待认领订单维度-->
+            <el-table :data="orderClaim" :default-sort="soryByTime">
+                <el-table-column prop="createTime" label="下单时间" style="width: 20%;" sortable></el-table-column>
+                <el-table-column prop="code" label="订单编号" style="width: 20%;" sortable></el-table-column>
+                <el-table-column prop="payPrice" label="订单金额" style="width: 10%;"></el-table-column>
+                <el-table-column prop="receiverName" label="收货人姓名" style="width: 10%;"></el-table-column> 
+                <el-table-column prop="receiverPhone" label="收货人手机号" style="width: 10%;"></el-table-column> 
+                <el-table-column prop="apartmentName" label="订单楼栋" style="width: 10%;"></el-table-column>
+                <el-table-column prop="quantity" label="订单数量" style="width: 5%;"></el-table-column> 
+            </el-table>
+        </el-tab-pane>
       <el-tab-pane label="骑手维度" name="riderDimension"> 
         <!--待认领骑手维度--> 
         <el-table :data="order">
@@ -57,50 +57,35 @@
 </template>
 
 <script>
-
 export default {
-  data() {
-    return {
-      activeName: "orderDimension", 
-      //待认领订单列表 
-      order: [ 
-        {
-          number: "0000000", 
-          money: "25元", 
-          building: "22栋", 
-          goods: "2件",
-          time: "2019-01-28",
-          riderName: "张三", 
-          riderPhone: "2142354325", 
-          riderStatus: 0, 
-          ordersNumber: "1",
-          reason: "一天 生病" 
-        }, 
-        {
-          number: "1111111",
-          money: "15元",
-          building: "22栋",
-          goods: "1件", 
-          time: "2019-01-28",
-          riderName: "李四", 
-          riderPhone: "159873947",
-          riderStatus: 1, 
-          ordersNumber: "1",
-          reason: ""
+    props: {
+        orderClaim: {
+            type: Array,
+            required: true
         }
-      ], 
-      //显示订单详情
-      GcLock: {
-        check: false
-      }, 
-      checkForm: { 
-        number: "",
-        money: "", 
-        building: "", 
-        time: "", 
-        goods: "" 
-      } 
-    };
+    },
+    data() {
+        return {
+            // 订单根据时间降序
+            soryByTime: {
+                prop: 'createTime',
+                order: 'descending'
+            },
+            activeName: "orderDimension", 
+            orderStatus:[], // 订单状态
+            order: [], //待认领订单列表 
+            //显示订单详情
+            GcLock: {
+                check: false
+            }, 
+            checkForm: { 
+                number: "",
+                money: "", 
+                building: "", 
+                time: "", 
+                goods: "" 
+            } 
+        };
   }, 
   methods: { 
     handleClick(tab, event) {

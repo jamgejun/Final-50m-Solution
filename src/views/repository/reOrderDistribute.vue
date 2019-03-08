@@ -1,7 +1,7 @@
 <template>
   <section>
     <!--待配送-->
-    <el-table :data="order">
+    <el-table :data="orderDistribute">
       <el-table-column prop="number" label="订单编号" style="width: 25%;" sortable></el-table-column>
       <el-table-column prop="money" label="订单金额" style="width: 10%;"></el-table-column>
       <el-table-column prop="building" label="订单楼栋" style="width: 10%;"></el-table-column>
@@ -15,24 +15,16 @@
 
 <script>
 export default {
-  data() {
-    return {
-      //待配送列表
-      order: [
-        {
-          number: "0000002",
-          money: "15元",
-          building: "22栋",
-          goods: "1件",
-          time: "2019-01-29",
-          riderName: "王五",
-          riderPhone: "142354325",
-          riderStatus: 1,
-          ordersNumber: "1",
-          reason: ""
+    props: {
+        orderDistribute: {
+            type: Array,
+            required: true
         }
-      ]
-    };
-  },
+    },
+    data() {
+        return {
+            //待配送列表
+        };
+    },
 }
 </script>

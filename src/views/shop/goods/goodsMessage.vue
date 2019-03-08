@@ -242,7 +242,6 @@ export default {
         getGoods(_this).then((res) => {
             _this.goodsList = res.data.data.rows
             _this.loading = false
-            console.log(_this.goodsList)
         })
     },
     methods: {
@@ -305,7 +304,12 @@ export default {
                 }).then((res) => {
                     _this.$message({
                         message: '删除成功',
-                        type: 'info'
+                        type: 'success'
+                    })
+                    _this.loading = true
+                    getGoods(_this).then((res) => {
+                        _this.goodsList = res.data.data.rows
+                        _this.loading = false
                     })
                 })
             }).catch(() => {})
