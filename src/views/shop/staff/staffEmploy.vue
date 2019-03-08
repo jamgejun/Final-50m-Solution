@@ -36,7 +36,7 @@
                 <el-form-item prop="name" label="账号名">
                     <el-input placeholder="请输入账号名" v-model="addForm.name"></el-input>
                 </el-form-item>
-                <el-form-item prop="accountType" label="选择账号类型">
+                <el-form-item prop="userType" label="选择账号类型">
                     <el-select v-model="addForm.accountType" placeholder="选择账号类型">
                         <el-option value="0" label="仓库管理员"></el-option>
                     </el-select>
@@ -88,6 +88,9 @@
 </template>
 
 <script>
+import { searchEmploy,  referEmploy, addEmploy, newEmploy } from "../../../api/staffEmploy_staffRider";
+import util from "../../../common/js/util";
+import { valid } from 'semver';
 export default {
     data() {
         return {
@@ -97,11 +100,11 @@ export default {
             },
             addForm: {
                 name: '',
-                accountType: '',
+                userType: '',
                 password: '',
                 checkPassword: '',
                 repository: '',
-                status: ''
+                status: '',
             },
             changeForm: {
                 name: '',
@@ -109,82 +112,45 @@ export default {
                 password: '',
                 checkPassword: '',
                 repository: '',
-                status: ''
+                status: '',
             },
             FormRules: {
 
             },
-            employList: [
-                {
-                    name: '121354',
-                    accountType: 0,
-                    Time: '2016-9-2',
-                    status: 0,
-                    password: '',
-                    repository: ''
-                }
-            ],
-            repositoryList : [
-                {
-                    name:'西门一号仓',
-                    status: 0,
-                    detail: '1212',
-                    MyBuilding: [
-                        {
-                            name: '24栋',
-                            message: '具体详情信息',
-                            status: 0
-                        },
-                        {
-                            name: '20栋',
-                            message: '具体详情信息',
-                            status: 1
-                        },
-                        {
-                            name: '26栋',
-                            message: '具体详情信息',
-                            status: 0
-                        }
-                    ],
-                },
-                {
-                    name:'南门一号仓',
-                    status: 1,
-                    detail: '1212',
-                    MyBuilding: [
-                        {
-                            name: '26栋',
-                            message: '具体详情信息',
-                            status: 0
-                        }
-                    ],
-                },
-                {
-                    name:'北门一号仓',
-                    status: 0,
-                    detail: '1212',
-                    MyBuilding: [
-                        {
-                            name: '24栋',
-                            message: '具体详情信息',
-                            status: 0
-                        },
-                        {
-                            name: '20栋',
-                            message: '具体详情信息',
-                            status: 1
-                        }
-                    ],
-                }
-            ],
+            employList: [],
+            repositoryList : [],
             Employsearch: {
-                name: ''
+                name: '',
             }
         }
     },
+    mounted: function () {
+        let _this = this
+        referEmploy(_this).then((res) => {
+            let employList = res.data.data.rows
+            _this.employList = res.data.data.rows
+            searchEmploy(_this).then((res) => {
+                    _this.employList = employList
+            }).catch((err) => {
+                console.log(err)
+            });  
+        })
+    },
     methods: {
         handleSeach() {
-
+            let _this=this
+            referEmploy(_this).then((res) => {
+                let employList = res.data.data.rows
+                this.employList = res.data.data.rows
+                searchEmploy(_this,{
+                    name:_this.Employsearch.name
+                })
+            }).then((res) => {
+                console.log(res)
+                _this.employList = res.data.data.rows
+            }).catch((err) => {
+                console.log(res)
+            })
         },
         handleChange(index, row) {
             let _this = this;
@@ -204,7 +170,43 @@ export default {
             _this.sElock[lock] = false;
             _this.$refs[formName].resetFields();
         },
-        addSubmit() {
+
+        // 新增员工提交
+        addSubmit(formName) {
+            let _this=this;
+            // 表单验证
+            _this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    _this.$confirm('是否确认添加骑手?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        addEmploy(_this,{
+                            name: _this.addForm.name,
+                            userType: _this.addForm.userType,
+                            password: _this.addForm.password,
+                            checkPassword: _this.addForm.checkPassword,
+                            repository: _this.addForm.repository,
+                            status: _this.addForm.status
+                        }).then((res) => {
+                            console.log(res)
+                            _this.$message({
+                                type: "success",
+                                message: "添加成功!"
+                            });
+                        })
+                    }).catch(() => {
+                        _this.$message({
+                            message: '已取消',
+                            type: 'success'
+                        });
+                    });
+                } else {
+                    console.log('error submit!!');
+                    return false;
+                };
+            })
 
         },
         resetSubmit() {
