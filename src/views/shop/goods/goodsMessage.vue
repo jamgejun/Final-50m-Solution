@@ -36,7 +36,7 @@
         </el-col>
 
         <div>
-            <el-table :data="goodsList"  v-loading = "loading">
+            <el-table :data="goodsList"  v-loading = "loading" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="36"></el-table-column>
                 <el-table-column prop="name" label="商品名称" align="center" width="100"></el-table-column>
                 <el-table-column prop="sellPrice" label="卖价" align="center" width="80"></el-table-column>
@@ -44,7 +44,7 @@
                 <el-table-column prop="statusName" label="状态" align="center" width="120"></el-table-column>
                 <el-table-column prop="goodsInfo" label="商品简介" align="center" width="150"></el-table-column>
                 <el-table-column prop="moreInfo" label="商品更多介绍" width="180"></el-table-column>
-                <el-table-column label="商品图片" width="200">
+                <el-table-column label="商品图片" width="150">
                     <template slot-scope="scope">
                         <img class="goodsImg" :src="scope.row.gooodsSymboPic" alt="">
                     </template>
@@ -58,28 +58,32 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <!-- <el-pagination
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :current-page="currentPage4"
-                :page-sizes="[100, 200, 300, 400]"
-                :page-size="100"
-                layout="total, sizes, prev, pager, next, jumper"
-                :total="400">
-            </el-pagination> -->
+            <div class="goodsFooter">
+                <el-button @click="handleDeleteAll()"  type="danger" :disabled="!deleteIds.length">批量删除</el-button>
+                <!-- <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage4"
+                    :page-sizes="[100, 200, 300, 400]"
+                    :page-size="100"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="400">
+                </el-pagination> -->
+            </div>
         </div>
+
         <!-- 新增商品 -->
-        <el-dialog title="新增商品" :visible.sync="GmLock.addGoods" :close-on-click-model="false" min-width="60vw" ref="addForm">
-            <add-form @close='close'></add-form>
+        <el-dialog title="新增商品" :visible.sync="GmLock.addGoods" :close-on-click-model="false" ref="addForm">
+            <add-form @addFormclose='addFormclose'></add-form>
         </el-dialog>
 
         <!-- 修改 -->
         <el-dialog title="修改商品" :visible.sync="GmLock.change" :close-on-click-model="false" >
-            <change-form :changeForm="changeForm"></change-form>
+            <change-form :changeForm="changeForm" @changeFormclose='changeFormclose'></change-form>
         </el-dialog>
 
         <!-- 补货/调价商品 -->
-        <el-dialog title="补货/调价商品" :visible.sync="GmLock.shangjia" :close-on-click-model="false" min-width="60vw">
+        <el-dialog title="补货/调价商品" :visible.sync="GmLock.shangjia" :close-on-click-model="false">
             <el-form :model="changeForm" :inline="true" ref="changeForm">
                 <el-form-item label="卖价">
                     <el-input v-model="changeForm.salePrice" auto-complete="off"></el-input>
@@ -100,7 +104,7 @@
 </template>
 
 <script>
-import { getGoods, getOneGoods, updateGoods } from '../../../api/goods/goods.js'
+import { getGoods, getOneGoods, deleteGoods } from '../../../api/goods/goods.js'
 import addForm from './components/add.vue'
 import changeForm from './components/change.vue'
 export default {
@@ -118,7 +122,11 @@ export default {
                 shangjia: false,
                 xiajia: false
             },
-            fileList2: [],
+            pageInformation: {
+                total: '',
+            },
+            ChangePrice: {},
+            deleteIds: [], // 批量删除商品的id信息
             // 搜索框
             GmSearch: {
                 name: '',
@@ -234,6 +242,7 @@ export default {
         getGoods(_this).then((res) => {
             _this.goodsList = res.data.data.rows
             _this.loading = false
+            console.log(_this.goodsList)
         })
     },
     methods: {
@@ -242,67 +251,31 @@ export default {
         },
         handleSeach() {
         },
-        handleAdd() {
-            let _this = this;
-            for(let i in _this.addForm) {
-               _this.addForm[i] = ''
-            }
-            _this.GmLock.addGoods = !_this.GmLock.addGoods;
-        },
-        close() {
-            let _this = this;
-            _this.GmLock.addGoods = !_this.GmLock.addGoods;
-        },
-        cancer(lock, formName) {
-            let _this = this;
-            _this.GmLock[lock] = false;
-            _this.$refs[formName].resetFields();
-        },
-        addSubmit(formName) {
-            let _this = this;
-            _this.$refs[formName].validate((valid) => {
-                if (valid) {
-                    _this.$confirm('是否确认添加商品?', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
-                        _this.goodsList.push(this.addForm);
-                        _this.$message({
-                            message: '操作成功',
-                            type: 'success'
-                        });
-                    }).catch(() => {
-                        _this.$message({
-                            message: '已取消',
-                            type: 'success'
-                        });
-                    });
-                } else {
-                    console.log('error submit!!');
-                    return false;
-                };
-            })
-        },
-        handleRemove(file, fileList) {
-            console.log(file, fileList);
-        },
-        handlePreview(file) {
-            console.log(file);
-        },
         handleStatus(status) {
            return status === 1 ? '正常' : '已下架'
         },
-
         handleUp(row) {
             return row.status = row.status === 0 ? 1 : 0;
         },
-        handleChangePrice(index, row) {
+
+        // 新增商品的显示和隐藏
+        // 关闭和打开新增商品方法
+        addFormclose() {
             let _this = this;
-            _this.GmLock.shangjia = !_this.GmLock.shangjia;
-            _this.changeForm = row;
+            _this.GmLock.addGoods = !_this.GmLock.addGoods;
         },
-        // 修改按钮
+        handleAdd() {
+            let _this = this;
+            _this.GmLock.addGoods = !_this.GmLock.addGoods;
+        },
+
+        // 关闭商品的显示和隐藏 
+        // 关闭修改商品
+        changeFormclose() {
+            let _this = this;
+            _this.GmLock.change = !_this.GmLock.change;
+        },
+        // 打开修改商品的详细信息
         handleChange(index, row) {
             let _this = this;
             _this.GmLock.change = !_this.GmLock.change;
@@ -311,21 +284,65 @@ export default {
                 _this.changeForm = res.data.data
             })
         },
-        updateSubmit() {
+
+        // 修改商品价格
+        handleChangePrice(index, row) {
             let _this = this;
-            _this.$confirm("是否确认提交?", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning"
-            }).then(() => {
-                updateGoods(_this, _this.changeForm.id, _this.changeForm).then((res) => {
-                    console.log(res);
-                })
-            })
+            _this.GmLock.shangjia = !_this.GmLock.shangjia;
+            _this.ChangePrice = row;
         },
+        
+        // 删除单个
         handleDelete(index, row) {
             let _this = this;
-            _this.goodsList.splice(index, 1);
+            _this.$confirm('是否删除该商品？删除后不可恢复！', '提示', {
+                type: 'warning'
+            }).then(() => {
+                let oneIds = []
+                oneIds.push(row.id) 
+                deleteGoods(_this, {
+                    ids: oneIds
+                }).then((res) => {
+                    _this.$message({
+                        message: '删除成功',
+                        type: 'info'
+                    })
+                })
+            }).catch(() => {})
+        },
+
+        // 删除多个商品逻辑和方法
+        // 处理已选中的商品id
+        handleSelectionChange(val) {
+            let _this = this
+            _this.deleteIds = []
+            for (let i = 0; i < val.length; i++) {
+                _this.deleteIds.push(val[i].id)
+            }
+            console.log(_this.deleteIds)
+        },
+        // 执行删除
+        handleDeleteAll() {
+            let _this = this;
+            _this.$confirm('是否批量删除已选商品？删除后不可恢复！', '提示', {
+                type: 'warning'
+            }).then(() => {
+                deleteGoods(_this, {
+                    ids: _this.deleteIds
+                }).then((res) => {
+                    _this.$message({
+                        message: '删除成功',
+                        type: 'info'
+                    })
+                    _this.deleteIds = []
+                })
+            }).catch(() => {})
+        },
+        // 取消按钮
+        cancer(lock, formName) {
+            let _this = this;
+            _this.GmLock[lock] = false;
+            _this.$refs[formName].resetFields();
         }
     }
 }
@@ -338,6 +355,12 @@ export default {
         margin-top: 10px;
         margin-bottom: 10px;
         vertical-align: middle;
+    }
+    .goodsFooter {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
     .el-dialog--small {
         width: 70%;

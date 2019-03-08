@@ -52,6 +52,7 @@ export default {
                     message: '请输入密码',
                     trigger: 'blur'
                 },
+                { max: 20, message: '密码长度不能超过20个字符', trigger: 'blur change'}
                 //{ validator: validaePass2 }
             ],
             code: [
@@ -59,7 +60,8 @@ export default {
                     required: true,
                     message: '请输入验证码',
                     trigger: 'blur'
-                }
+                },
+                { max:4, message: '验证码长度最大4个字符', trigger: 'blur change'}
             ]
             },
             checked: true
@@ -123,6 +125,7 @@ export default {
                                 _this.$store.dispatch('getMenus', rows);
                                 setRouter(_this, _this.$store.state.permissionList)
                                 // 默认跳转到位于菜单第一项的界面
+                                clearInterval(_this.Timer)
                                 _this.$router.push({
                                     path: _this.$store.state.routesList[0].children[0].path
                                 });
@@ -134,7 +137,6 @@ export default {
                         // 清空数据
                         _this.$refs['ruleForm2'].resetFields();
                         _this.logining = false;
-                        console.log(err)
                     })
                 }
             });
@@ -144,14 +146,6 @@ export default {
         let _this = this;
         // 获取验证码
         getValidatecode(_this);
-        // 60秒自动刷新
-        _this.Timer = setInterval( () => {
-            _this.codeTime--
-            if ( _this.codeTime === 0 ) {
-                _this.codeTime = 60
-                getValidatecode(_this)
-            }
-        }, 1000)
     }
 }
 </script>

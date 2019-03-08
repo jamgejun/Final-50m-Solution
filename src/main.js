@@ -34,8 +34,7 @@ axios.defaults.withCredentials = true;
 
 
 // 使用npm run build 的时候， 将上面注释掉  default 路径使用下面的就行
-// axios.defaults.baseURL = 'http://t159z26789.iask.in/f50m-web/'  //打包部署上线时 
-// axios.defaults.baseURL = 'http://localhost:8888/f50m-web/'  //打包部署上线时 
+// axios.defaults.baseURL = '/f50m-web/'  //打包部署上线时 
 
 // 解决跨域
 // axios.defaults.headers.post["Content-type"]='application/x-www-form-urlencoded';
@@ -72,7 +71,6 @@ Vue.prototype.$ajax = axios;
 
 router.beforeEach((to, from, next) => {
     if (!store.state.userToken) {
-        console.log('没有权限 只能登录不需要权限的路由');
         if (to.matched.length>0 && !to.matched.some(record => record.meta.requiresAuth)) {
             next()
         } else {

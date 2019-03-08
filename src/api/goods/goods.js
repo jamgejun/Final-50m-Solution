@@ -27,14 +27,16 @@ export const getOneGoods = (ev, id, data) => {
     })
 }
 
+// 更新商品接口
 export const updateGoods = (ev, id, data) => {
-    return ev.$ajax.put(`/api/goodss/${id}`, qs.stringify(data), {
+    return ev.$ajax.put(`/api/goodss/${id}`, data, {
         headers: {
             'Content-Type': 'application/json'
         }
     })
 }
 
+// 添加商品接口
 export const addGoods = (ev, data) => {
     return ev.$ajax.post(`/api/goodss`, data, {
         headers: {
@@ -43,6 +45,29 @@ export const addGoods = (ev, data) => {
     })
 }
 
+// 更新商品图片
 export const goodspictures = (ev, data) => {
     return ev.$ajax.put(`/api/goodspictures/`)
+}
+
+// 批量删除商品接口
+export const deleteGoods = (ev, data) => {
+    return ev.$ajax.delete(`/api/goodss`, {
+        data: data
+    }, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}
+
+// 更新图片接口
+export const updatePicture = (ev, data) => {
+    return ev.$ajax.put(`/api/goodspictures/`, {
+        data: data
+    }, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
 }

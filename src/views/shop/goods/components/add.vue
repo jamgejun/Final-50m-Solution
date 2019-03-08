@@ -1,6 +1,6 @@
 <template>
     <section>
-        <el-form :model="addForm" :rules="formRules" ref="addForm" status-icon :inline="true" label-width="80">
+        <el-form :model="addForm" :rules="formRules" ref="addForm" status-icon :inline="true" label-width="80px" v-loading="isLoading">
             <el-form-item label="商品名" prop="name">
                 <el-input v-model="addForm.name" auto-complete="off"></el-input>
             </el-form-item>
@@ -61,12 +61,12 @@
             <el-form-item label="商品信息" prop="goodsInfo">
                 <el-input type="textarea" v-model="addForm.goodsInfo" auto-complete="off"></el-input>
             </el-form-item>
-            <el-form :inline="true" enctype="multipart/form-data">
+            <el-form :inline="true" label-width="80px" enctype="multipart/form-data">
                 <el-form-item label="选择图片" label-width="80">
                     <el-upload
-                        action="/api/goodss"
-                        :auto-upload="true"
-                        :headers = 'headeObj'
+                        action="#"
+                        :auto-upload="false"
+                        accept="image/png,image/gif,image/jpg,image/jpeg"
                         :multiple="true"
                         list-type="picture-card"
                         :on-change = "changFile"
@@ -79,39 +79,19 @@
                 </el-form-item>
             </el-form>
         </el-form>
-        <!-- <form id="form1" method="post"  enctype="multipart/form-data" >
-            <input type="text" name="name" placeholder="姓名">
-            <input type="text" name="status" placeholder="状态">
-            <input type="text" name="code" id="" placeholder="条码">
-            <input type="text" name="sellPrice" id="" placeholder="卖价">
-            <input type="text" name="originalPrice" id="" placeholder="原价">
-            <input type="text" name="info" id="" placeholder="默认信息">
-            <input type="text" name="unit" id="" placeholder="单位">
-            <input type="text" name="typeId" id="" placeholder="种类ID">
-            <input type="text" name="moreInfo" id="" placeholder="更多信息">
-            <input type="text" name="displayIndex" id="" placeholder="顺序">
-            <input type="text" name="isHot" id="" placeholder="是否热门">
-            <input type="text" name="goodsInfo" id="" placeholder="商品介绍">
-            <input type="file" name="pictures">
-            <button type="submit" @click="submitI">提交</button>
-        </form> -->
         <div class="addFormfooter">
-            <el-button @click.native="close('addGoods', 'addForm')">取消</el-button>
+            <el-button @click.native="close()">取消</el-button>
             <el-button type="primary" @click.native="addSubmit">提交</el-button>
         </div>
     </section>
 </template>
 
 <script>
-import jquery from 'jquery'
-import qs from 'qs'
 import { addGoods } from '../../../../api/goods/goods.js'
 export default {
     data() {
         return {
-            headeObj: {
-                "X-SDX-Token": this.$store.state.userToken
-            },
+            isLoading: false,
             addForm: {
                 name: '消食片',
                 code: '',
@@ -127,42 +107,19 @@ export default {
                 goodsInfo: '',
                 pictures: []
             },
-            formRules: {},
+            formRules: {
+                name: {
+
+                }
+            },
             dialogImageUrl: '',
             dialogVisible: false
         }
     },
-    mounted: function () {
-        let _this = this;
-    },
-    destroyed: function () {
-        console.log('离开')
-    },
     methods: {
-        // submitI() {
-        //     jquery.ajax({
-        //         type: "POST",//方法类型
-        //         dataType: "json",//预期服务器返回的数据类型
-        //         url: "/api/goodss" ,//url
-        //         data: $('#form1').serialize(),
-        //         headers: {
-        //             'X-SDX-Token': 'vxdg57qv17c28y24ezjv6wpcaldpfpj9'
-        //         },
-        //         success: function (result) {
-        //             console.log(result);//打印服务端返回的数据(调试用)
-        //             if (result.resultCode == 200) {
-        //                 alert("SUCCESS");
-        //             }
-        //             ;
-        //         },
-        //         error : function() {
-        //             alert("异常！");
-        //         }
-        //     });
-        // },
         close() {
             let _this = this;
-            _this.$emit('close' )
+            _this.$emit('addFormclose')
         },
         beforeAvatarUpload(file) {
             console.log(file)
@@ -179,12 +136,10 @@ export default {
             this.dialogImageUrl = file.url;
             this.dialogVisible = true;
         },
+        // 处理新增商品提交
         addSubmit() {
             let _this = this;
-            // let params = new URLSearchParams();
-            //    for(var key in _this.addForm){
-            //        params.append(key,_this.addForm[key])
-            // }
+            _this.isLoading = !_this.isLoading
             let formData = new FormData()
             formData.append('name', _this.addForm.name)
             formData.append('code', _this.addForm.code)
@@ -198,12 +153,26 @@ export default {
             formData.append('displayIndex', _this.addForm.displayIndex)
             formData.append('isHot', _this.addForm.isHot)
             formData.append('goodsInfo', _this.addForm.goodsInfo)
-            formData.append('pictures', _this.addForm.pictures[0])
-            // addGoods(_this, formData)
+            for(let i = 0; i<_this.addForm.pictures.length; i++) {
+                formData.append('pictures', _this.addForm.pictures[i])
+            }
+            // 对返回的信息进行处理
             _this.$ajax.post(`/api/goodss`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
+            }).then((res) => {
+                _this.$message({
+                    message: '添加成功！',
+                    type: 'success'
+                })
+                _this.isLoading = !_this.isLoading
+            }).catch(() => {
+                _this.$message({
+                    message: '出错，请联系管理员',
+                    type: 'warning'
+                })
+                _this.isLoading = !_this.isLoading
             })
         }
     }

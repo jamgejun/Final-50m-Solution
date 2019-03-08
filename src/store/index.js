@@ -5,7 +5,7 @@ export default {
         userToken:'',
         permissionList: [],
         routesList: [],
-        dictorys: {}
+        dictorys: {},
     },
     getters: {
         getToken: () => {
