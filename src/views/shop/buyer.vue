@@ -13,7 +13,7 @@
                 </el-form-item>
                 <el-form-item prop="createTime" label="注册时间">
                     <el-date-picker
-                        v-model="buyerSearch.duringTime"
+                        v-model="buyerSearch.createTime"
                         type="daterange"
                         range-separator="至"
                         start-placeholder="开始日期"
@@ -21,7 +21,7 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="handleSeach">查询</el-button>
+                    <el-button type="primary" @click="handleSearch">查询</el-button>
                 </el-form-item>
             </el-form>
         </el-col>
@@ -56,11 +56,11 @@ export default {
     },
     mounted: function () {
         let _this = this
+        _this.loading = !_this.loading
         referBuyer(_this).then((res) => {
-            let buyerList = res.data.data.rows
             _this.buyerList = res.data.data.rows
             searchBuyer(_this).then((res) => {
-                    _this.buyerList = buyerList
+                _this.buyerList = buyerList
             }).catch((err) => {
                 console.log(err)
             });  
@@ -68,19 +68,19 @@ export default {
     },
     methods: {
         //处理查询
-        handleSeach() {
+        handleSearch() {
             let _this = this
+            _this.loading = !_this.loading
             referBuyer(_this).then((res) => {
-                let buyerList = res.data.data.rows
-                this.buyerList = res.data.data.rows
+                _this.buyerList = res.data.data.rows
                 searchBuyer(_this,{
                     name:_this.buyerSearch.name,
                     realName:_this.buyerSearch.realName,
                     phone:_this.buyerSearch.phone,
-                    createTime:_this.buyerSearch.createTime
+                    createStartTime:_this.buyerSearch.createTime[0],
+                    createEndTime: _this.buyerSearch.createTime[1]
                 })
             }).then((res) => {
-                console.log(res)
                 _this.buyerList = res.data.data.rows
             }).catch((err) => {
                 console.log(err)

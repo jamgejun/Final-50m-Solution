@@ -20,7 +20,7 @@
       </el-form>
     </el-col>
 
-    <el-table :data="RpList">
+    <el-table :data="RpList" v-loading="loading">
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column type="index" width="60"></el-table-column>
       <el-table-column prop="name" label="仓库名" align="center" width="120" sorttable></el-table-column>
@@ -122,6 +122,7 @@ import { getRepository, addRepository, refreshRepository, deleteRepository } fro
 export default {
   data() {
     return {
+      loading: false,
       // 模态框开关
       SwitchLock: {
         // 增加仓库
@@ -167,7 +168,12 @@ export default {
   },
   mounted: function () {
   let _this = this;
-    getRepository(_this)
+  _this.loading = !_this.loading
+    getRepository(_this).then((res) => {
+      _this.loading = !_this.loading
+    }).catch((err) => {
+
+    });
   },
   methods: {
     // 搜索工具栏
@@ -175,7 +181,12 @@ export default {
     // 处理搜索
     handleSearch() {
       let _this = this;
-      getRepository(_this);
+      _this.loading = !_this.loading
+      getRepository(_this).then((res) => {
+      _this.loading = !_this.loading
+    }).catch((err) => {
+      
+    });
     },
     // 新增仓库按钮
     handleAddRp() {

@@ -24,7 +24,7 @@
             <el-table-column prop="Time" label="创建时间"></el-table-column>
             <el-table-column label="操作" align="left">
                 <template slot-scope="scope">
-                    <el-button size="small" type="primary"  @click="handleChange(scope.$index, scope.row)">重置</el-button>
+                    <el-button size="small" type="primary"  @click="handleChange(scope.$index, scope.row)">重置密码</el-button>
                     <el-button size="small" type="danger"  @click="handleDel(scope.$index, scope.row)">删除</el-button>
                 </template>
             </el-table-column>
@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import { searchEmploy,  referEmploy, addEmploy, newEmploy } from "../../../api/staffEmploy_staffRider";
+import { searchEmploy,  referEmploy, addEmploy, newEmploy } from "../../../api/staffManage/staffEmploy";
 import util from "../../../common/js/util";
 import { valid } from 'semver';
 export default {

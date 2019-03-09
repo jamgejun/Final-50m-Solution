@@ -25,7 +25,7 @@
     <el-table
       :data="buildingList"
       highlight-current-row
-      v-loading="listLoading"
+      v-loading="loading"
       @selection-change="selsChange"
       style="width: 100%;"
     >
@@ -53,29 +53,29 @@
         <el-form-item label="楼栋名" prop="name">
           <el-input v-model="addForm.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="运营状态">
+        <el-form-item label="运营状态" prop="status">
           <el-radio-group v-model="addForm.status">
-            <el-radio class="radio" :label="1">正常</el-radio>
-            <el-radio class="radio" :label="2">停营</el-radio>
+            <el-radio :label="1">正常</el-radio>
+            <el-radio :label="2">停营</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="详细信息">
+        <el-form-item label="详细信息" prop="info">
           <el-input type="textarea" v-model="addForm.info"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click.native="this.dialogVisible = false">取消</el-button>
+        <el-button @click.native="this.dialogVisible = false">取消</el-button>        
         <el-button type="primary" @click.native="addSubmit">提交</el-button>
       </div>
     </el-dialog>
 
     <!-- 修改 -->
     <el-dialog title="修改楼栋" :visible.sync="GcLock.change" :close-on-click-model="false">
-      <el-form :data="changeForm" label-width="100px" ref="changeForm">
-        <el-form-item label="楼栋名">
+      <el-form :data="changeForm" label-width="100px" :rules="changeRules" ref="changeForm">
+        <el-form-item label="楼栋名" prop="name">
           <el-input v-model="changeForm.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="楼栋详情">
+        <el-form-item label="楼栋详情" prop="info">
           <el-input v-model="changeForm.info" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
@@ -95,7 +95,7 @@ export default {
   data() {
     return {
       // 控制表单载入状态
-      listLoading: 0,
+      loading: false,
       id: '',
       // 模态框控制
       GcLock: {
@@ -103,7 +103,6 @@ export default {
       },
       // 新增楼栋
       dialogVisible: false,
-      addLoading: 0,
       addForm: {
         name: "",
         info: "",
@@ -111,16 +110,22 @@ export default {
         storageId: '',
       },
       addFormRules: {
-        name: {
+        name: [
+          {
           required: true,
           message: "请输入楼栋名",
           trigger: "blur"
         },
+        { max: 15, message: '用户名长度不超过15个字符', trigger: 'blur change' }
+        ],
         status: {
           required: true,
           message: "选择楼栋运营状态",
-          trigger: "blur"
+        },
+        info: {
+          max: 40, message: '详细信息长度不超过40个字符'
         }
+
       },
       // 查看详情
       // 选择楼栋状态
@@ -136,16 +141,25 @@ export default {
         id: '',
         name: "",
         info: ""
+      },
+      changeRules: {
+        name: {
+          max: 10, message: '楼栋名长度不超过10个字符'
+        },
+        info: {
+          max: 40, message: '楼栋详情长度不超过40个字符'
+        }
       }
     };
   },
   mounted: function () {
-  let _this = this;
+    let _this = this;
+    _this.loading = !_this.loading
     searchBuilding(_this).then((res) => {
-      console.log(res)
+      _this.loading = !_this.loading
       _this.BuildingList = res.data.data.rows
     }).catch((err) => {
-      console.log(err)
+
     });
   },
   methods: {
@@ -168,11 +182,12 @@ export default {
     // 处理查询
     handleSearch() {
       let _this = this
+      _this.loading = !_this.loading
       searchBuilding(_this,{
         name:_this.buildingStatus.name,
         status:_this.buildingStatus.status
       }).then((res) => {
-        console.log(res)
+        _this.loading = !_this.loading
         _this.buildingList = res.data.data.rows
       }).catch((err) => {
         console.log(err)
@@ -207,6 +222,7 @@ export default {
                   type: "success",
                   message: "添加成功!"
                 });
+                searchBuilding(_this);
               })
             }).catch(() => {
               

@@ -66,7 +66,7 @@
 
         <!-- 新增骑手 -->
         <el-dialog title="增加骑手" :visible.sync="RiderLock.add" :close-on-click-model="false" min-width="60vw">
-            <el-form :model="addForm" ref="addForm">
+            <el-form :model="addForm" :rules="addRules" ref="addForm">
                 <el-form :inline="true">
                     <el-form-item prop="realName" label="骑手姓名">
                         <el-input v-model="addForm.realName"></el-input>
@@ -79,9 +79,9 @@
                         </el-date-picker>
                     </el-form-item>
                 </el-form>
-                <el-form :inline="true">
+                <el-form :inline="true" :model="addForm"  :rules="addRules">
                     <el-form-item prop="phone" label="骑手电话">
-                        <el-input type="text" v-model="addForm.phone"></el-input>
+                        <el-input type="text" v-model="addForm.phone" auto-complete="off"></el-input>
                     </el-form-item>
                     <el-form-item prop="apartmentId" label="服务楼栋">
                         <el-select v-model="addForm.apartmentId"  placeholder="请选择骑手服务楼栋">
@@ -118,7 +118,7 @@
 
         <!-- 修改骑手 -->
         <el-dialog title="修改骑手" :visible.sync="RiderLock.change" :close-on-click-model="false" min-width="60vw">
-            <el-form :data="changeForm" ref="changeForm">
+            <el-form :data="changeForm" :rules="changeRules" ref="changeForm">
                 <el-form :inline="true">
                     <el-form-item prop="realName" label="骑手姓名">
                         <el-input v-model="changeForm.realName"></el-input>
@@ -171,9 +171,26 @@
 </template>
 
 <script>
-import { searchRider, referRider, addRider, changeRider, updateRider, deleteRider } from "../../../api/staffEmploy_staffRider";
+import { searchRider, referRider, addRider, changeRider, updateRider, deleteRider } from "../../../api/staffManage/staffRider";
+import { error } from 'util';
 export default {
     data() {
+        //骑手手机号显示格式
+        var checkPhone = (rule, value, callback) => {
+            if(!value) {
+                return callback(new Error('手机号不能为空'));
+            }
+            else if(Number.isInteger(value)) {
+                callback(new Error('请输入数字值'));
+            } else {
+                let pattern = /0?(13|14|15|18|17)[0-9]{9}/
+                if(!pattern.test(value)) {
+                    callback(new Error('请输入正确的手机号格式'));
+                } else {
+                    callback();
+                }
+            }
+        }
         return {
             // 搜索框处理
             Ridersearch: {
@@ -197,6 +214,11 @@ export default {
                 positionStatus: 10,
                 workStatus: 9,
             },
+            addRules: {
+                phone:[
+                    { validator: checkPhone, trigger: 'blur' }
+                ]
+            },
             changeForm: {
                 jionTime: '',
                 realName: '',
@@ -204,6 +226,11 @@ export default {
                 apartmentId: '',
                 positionStatus: '',
                 workStatus: '',
+            },
+            changeRules: {
+                phone:[
+                    { validator: checkPhone, trigger: 'blur' }
+                ]
             },
             // 骑手列表
             RiderList: []
@@ -285,6 +312,7 @@ export default {
                         type: 'warning'
                     }).then(() => {
                         addRider((_this, {
+                            workStatus:_this.Ridersearch.workStatus,
                             apartmentId:_this.Ridersearch.apartmentId,
                             positionStatus:_this.Ridersearch.positionStatus
                         }))

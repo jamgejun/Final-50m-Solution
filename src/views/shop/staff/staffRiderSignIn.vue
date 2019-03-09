@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { searchRider, referRider, addRider, changeRider, updateRider, deleteRider } from "../../../api/staffEmploy_staffRider";
+import { searchRider, referRider, addRider, changeRider, updateRider, deleteRider } from "../../../api/staffManage/staffRider";
 export default {
     data() {
         return {
