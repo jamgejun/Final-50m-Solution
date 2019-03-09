@@ -11,7 +11,9 @@ export const getStatus = (ev, id) => {
 
 // 获取所有商品
 export const getGoods = (ev, data) => {
-    return ev.$ajax.get(`/api/goodss/`, qs.stringify(data), {
+    return ev.$ajax.get(`/api/goodss/`, {
+        params: data
+    }, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         }

@@ -15,7 +15,7 @@
         </el-tab-pane>
       <el-tab-pane label="骑手维度" name="riderDimension"> 
         <!--待认领骑手维度--> 
-        <el-table :data="order">
+        <el-table :data="orderClaim">
           <el-table-column prop="riderName" label="骑手姓名"></el-table-column> 
           <el-table-column prop="riderPhone" label="骑手手机号"></el-table-column>
           <el-table-column prop="riderStatus" label="骑手工作状态"> 
@@ -71,7 +71,7 @@ export default {
                 prop: 'createTime',
                 order: 'descending'
             },
-            activeName: "orderDimension", 
+            activeName: "riderDimension", 
             orderStatus:[], // 订单状态
             order: [], //待认领订单列表 
             //显示订单详情

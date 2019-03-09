@@ -15,6 +15,7 @@
 </template>
 <script>
 import { getDictorys } from '../../api/dictorys/dictorys.js'
+import { getOrder } from '../../api/repositoryOrder/order.js'
 import Claim from './reOrderClaim.vue';
 import Output from './reOrderOutput.vue';
 import Distribute from './reOrderDistribute.vue';

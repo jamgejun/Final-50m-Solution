@@ -1,83 +1,79 @@
 <template>
     <section>
-        <el-form :model="addForm" :rules="formRules" ref="addForm" status-icon :inline="true" label-width="80px" v-loading="isLoading">
-            <el-form-item label="商品名" prop="name">
-                <el-input v-model="addForm.name" auto-complete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="商品状态" prop="status">
-                <el-select v-model="addForm.status" placeholder="选择商品状态">
-                    <el-option label="正常" value="6"></el-option>
-                    <el-option label="已下架" value="7"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="卖价" prop="originalPrice">
-                <el-input v-model="addForm.sellPrice" auto-complete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="原价" prop="originalPrice">
-                <el-input v-model="addForm.originalPrice" auto-complete="off"></el-input>
-            </el-form-item>
+        <el-form :model="addForm" :rules="formRules" ref="addForm" status-icon label-width="80px" v-loading="isLoading">
+            <el-form :model="addForm" :inline="true" label-width="80px">
+                <el-form-item label="商品名" prop="name">
+                    <el-input v-model="addForm.name" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="原价" prop="originalPrice">
+                    <el-input v-model="addForm.originalPrice" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="卖价" prop="originalPrice">
+                    <el-input v-model="addForm.sellPrice" auto-complete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <el-form :model="addForm" :inline="true" label-width="80px">
+                <el-form-item label="商品单位" prop="unit">
+                    <el-select v-model="addForm.unit" placeholder="选择商品单位">
+                        <el-option 
+                            v-for="(item, index) in goodsUnit"
+                            :key="index"
+                            :label="item.name"
+                            :value="item.id"
+                            ></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="商品分类" prop="typeId">
+                    <el-select v-model="addForm.typeId" placeholder="选择商品分类">
+                        <el-option
+                                v-for="(item, index) in goodsCategory"
+                                :key="index"
+                                :label="item.name" 
+                                :value="item.id"
+                            ></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="商品状态" prop="displayIndex">
+                    <el-select v-model="addForm.status" placeholder="选择商品状态">
+                        <el-option
+                                v-for="(item, index) in goodsStatus"
+                                :key="index"
+                                :label="item.name" 
+                                :value="item.id"
+                            ></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="是否热门" prop="isHot">
+                    <el-select v-model="addForm.isHot" placeholder="选择是否热门">
+                        <el-option label="是" value="1"></el-option>
+                        <el-option label="否" value="0"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
             <el-form-item label="商品简介" prop="info">
                 <el-input type="textarea" v-model="addForm.info" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="商品更多介绍" prop="moreInfo">
                 <el-input type="textarea" v-model="addForm.moreInfo" auto-complete="off"></el-input>
             </el-form-item>
-            <el-form-item label="商品状态" prop="unit">
-                <el-select v-model="addForm.unit" placeholder="选择商品状态">
-                    <el-option label="个" value="19"></el-option>
-                    <el-option label="张" value="20"></el-option>
-                    <el-option label="袋" value="21"></el-option>
-                    <el-option label="箱" value="22"></el-option>
-                    <el-option label="桶" value="23"></el-option>
-                    <el-option label="包" value="24"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="商品分类" prop="typeId">
-                <el-select v-model="addForm.unit" placeholder="选择商品状态">
-                    <el-option label="个" value="19"></el-option>
-                    <el-option label="张" value="20"></el-option>
-                    <el-option label="袋" value="21"></el-option>
-                    <el-option label="箱" value="22"></el-option>
-                    <el-option label="桶" value="23"></el-option>
-                    <el-option label="包" value="24"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="商品更多介绍" prop="displayIndex">
-                <el-select v-model="addForm.unit" placeholder="选择商品状态">
-                    <el-option label="个" value="19"></el-option>
-                    <el-option label="张" value="20"></el-option>
-                    <el-option label="袋" value="21"></el-option>
-                    <el-option label="箱" value="22"></el-option>
-                    <el-option label="桶" value="23"></el-option>
-                    <el-option label="包" value="24"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="商品更多介绍" prop="isHot">
-                <el-select v-model="addForm.isHot" placeholder="选择商品状态">
-                    <el-option label="是" value="1"></el-option>
-                    <el-option label="否" value="0"></el-option>
-                </el-select>
-            </el-form-item>
             <el-form-item label="商品信息" prop="goodsInfo">
                 <el-input type="textarea" v-model="addForm.goodsInfo" auto-complete="off"></el-input>
             </el-form-item>
-            <el-form :inline="true" label-width="80px" enctype="multipart/form-data">
-                <el-form-item label="选择图片" label-width="80">
-                    <el-upload
-                        action="#"
-                        :auto-upload="false"
-                        accept="image/png,image/gif,image/jpg,image/jpeg"
-                        :multiple="true"
-                        list-type="picture-card"
-                        :on-change = "changFile"
-                        :on-remove="handleRemove">
-                        <i class="el-icon-plus"></i>
-                    </el-upload>
-                    <el-dialog :visible.sync="dialogVisible">
-                        <img width="100%" :src="dialogImageUrl" alt="">
-                    </el-dialog>
-                </el-form-item>
-            </el-form>
+            <el-form-item label="选择图片">
+                <el-upload
+                    action="#"
+                    :auto-upload="false"
+                    accept="image/png,image/gif,image/jpg,image/jpeg"
+                    :multiple="true"
+                    list-type="picture-card"
+                    :on-change = "changFile"
+                    :on-remove="handleRemove">
+                    <i class="el-icon-plus"></i>
+                </el-upload>
+                <el-dialog :visible.sync="dialogVisible">
+                    <img width="100%" :src="dialogImageUrl" alt="">
+                </el-dialog>
+            </el-form-item>
         </el-form>
         <div class="addFormfooter">
             <el-button @click.native="close()">取消</el-button>
@@ -88,25 +84,30 @@
 
 <script>
 import { addGoods } from '../../../../api/goods/goods.js'
+import { getDictorys } from '../../../../api/dictorys/dictorys.js'
 export default {
+    mounted: function (){
+        let _this = this;
+        // 从字典表获取商品状态
+        getDictorys(_this, 3).then((res) => {
+            _this.goodsStatus = res.data.data
+        })
+        // 获取商品单位
+        getDictorys(_this, 6).then((res) => {
+            _this.goodsUnit = res.data.data
+        })
+        // 获取商品分类
+        getDictorys(_this, 11).then((res) => {
+            _this.goodsCategory = res.data.data
+        })
+    },
     data() {
         return {
+            goodsStatus: [], // 获取商品的状态
+            goodsUnit: [], // 商品的单位
+            goodsCategory: [], // 商品的分类
             isLoading: false,
-            addForm: {
-                name: '消食片',
-                code: '',
-                status: 6,
-                sellPrice: 1,
-                originalPrice: '',
-                info: '',
-                unit: 19,
-                typeId: 2,
-                moreInfo: '',
-                displayIndex: 2,
-                isHot: 1,
-                goodsInfo: '',
-                pictures: []
-            },
+            addForm: {},
             formRules: {
                 name: {
 
@@ -139,41 +140,45 @@ export default {
         // 处理新增商品提交
         addSubmit() {
             let _this = this;
-            _this.isLoading = !_this.isLoading
-            let formData = new FormData()
-            formData.append('name', _this.addForm.name)
-            formData.append('code', _this.addForm.code)
-            formData.append('status', _this.addForm.status)
-            formData.append('sellPrice', _this.addForm.sellPrice)
-            formData.append('originalPrice', _this.addForm.originalPrice)
-            formData.append('info', _this.addForm.info)
-            formData.append('unit', _this.addForm.unit)
-            formData.append('typeId', _this.addForm.typeId)
-            formData.append('moreInfo', _this.addForm.moreInfo)
-            formData.append('displayIndex', _this.addForm.displayIndex)
-            formData.append('isHot', _this.addForm.isHot)
-            formData.append('goodsInfo', _this.addForm.goodsInfo)
-            for(let i = 0; i<_this.addForm.pictures.length; i++) {
-                formData.append('pictures', _this.addForm.pictures[i])
-            }
-            // 对返回的信息进行处理
-            _this.$ajax.post(`/api/goodss`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
+            _this.$confirm('是否添加商品？', '提示', {
+                type: 'warning'
+            }).then(() => {
+                _this.isLoading = !_this.isLoading
+                let formData = new FormData()
+                formData.append('name', _this.addForm.name)
+                formData.append('code', _this.addForm.code)
+                formData.append('status', _this.addForm.status)
+                formData.append('sellPrice', _this.addForm.sellPrice)
+                formData.append('originalPrice', _this.addForm.originalPrice)
+                formData.append('info', _this.addForm.info)
+                formData.append('unit', _this.addForm.unit)
+                formData.append('typeId', _this.addForm.typeId)
+                formData.append('moreInfo', _this.addForm.moreInfo)
+                formData.append('displayIndex', _this.addForm.displayIndex)
+                formData.append('isHot', _this.addForm.isHot)
+                formData.append('goodsInfo', _this.addForm.goodsInfo)
+                for(let i = 0; i<_this.addForm.pictures.length; i++) {
+                    formData.append('pictures', _this.addForm.pictures[i])
                 }
-            }).then((res) => {
-                _this.$message({
-                    message: '添加成功！',
-                    type: 'success'
+                // 对返回的信息进行处理
+                _this.$ajax.post(`/api/goodss`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }).then((res) => {
+                    _this.$message({
+                        message: '添加成功！',
+                        type: 'success'
+                    })
+                    _this.isLoading = !_this.isLoading
+                }).catch(() => {
+                    _this.$message({
+                        message: '出错，请联系管理员',
+                        type: 'warning'
+                    })
+                    _this.isLoading = !_this.isLoading
                 })
-                _this.isLoading = !_this.isLoading
-            }).catch(() => {
-                _this.$message({
-                    message: '出错，请联系管理员',
-                    type: 'warning'
-                })
-                _this.isLoading = !_this.isLoading
-            })
+            }).catch(() => {})
         }
     }
 }
