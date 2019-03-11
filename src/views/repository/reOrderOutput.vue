@@ -14,10 +14,42 @@
     <div class="printOrder">
         <el-button type="success" @click="Print">打印所有订单</el-button>
     </div>
+
+    <ul id="output">
+        <li 
+            v-for="(item, index) in ordersList"
+            :key="index"
+            style="margin-bottom: 20px; width:80%; margin: 0 auto; border-bottom: 1px solid #ccc;">
+            <h2>{{ item.apartmentName }}</h2>
+            <div>
+                <h3>骑手信息</h3>
+                <span>骑手姓名：{{ item.riderName }}</span>
+            </div>
+            <div>
+                <h3>配送信息</h3>
+                <span>收货人：{{ item.receiverName }}</span><br>
+                <span>收货人电话：{{ item.receiverPhone }}</span><br/>
+                <span>详细地址：{{ item.address }}</span>
+            </div>
+            <div>
+                <h3>订单信息</h3>
+                <p style="display:flex; align-item:center; justify-content: space-bettwen">
+                    <span>订单编号：</span><span>{{ item.code }}</span>
+                </p>
+                <p style="display:flex; align-item:center; justify-content: space-bettwen">
+                    <span>下单时间：</span><span>{{ item.createTime }}</span>
+                </p>
+                <p style="display:flex; align-item:center; justify-content: space-bettwen">
+                    <span>支付金额：</span><span>{{ item.payPrice }}</span>
+                </p>
+            </div>
+        </li>
+    </ul>
   </section>
 </template>
 
 <script>
+import { updateAllOrder, getOderDetail } from '../../api/repositoryOrder/order.js'
 import jquery from 'jquery'
 import printMe from '../../plugin/printMe.js';
 export default {
@@ -34,6 +66,7 @@ export default {
                 order: 'descending'
             },
             //待出库列表
+            ordersList: [],
             show: true,
             orderStatus: [],
             order: [],
@@ -58,7 +91,28 @@ export default {
     },
     // 打印订单
     Print() {
-      jquery('#table').printMe()
+        let _this = this;
+        for(let i=0; i<orderOutput.length; i++) {
+            _this.orderStatus.push(orderOutput[i].id)
+            getOderDetail(_this, orderOutput[i].id).then((res) => {
+                _this.ordersList[i] = res.data.data
+            })
+        }
+        updateAllOrder(_this, {
+            ids: _this.orderStatus,
+            status: 14
+        }).then((res) => {
+            _this.$message({
+                message: '更新订单成功，即将为您打印！',
+                type: 'success'
+            })
+            jquery('#output').printMe()
+        }).catch((err) => {
+            _this.$message({
+                message: '打印出错，请尽快联系管理员',
+                type: 'warning'
+            })
+        })
     }
   }
 };
