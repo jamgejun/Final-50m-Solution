@@ -241,7 +241,7 @@ export default {
                     }
                 })
                 if (rowsCheck.length) {
-                    for (let k=0; k<rowsCheck.length; k++) {
+                    for (let k = 0; k<rowsCheck.length; k++) {
                         _this.$refs.goodsList.toggleRowSelection(rowsCheck[k], true) 
                     }
                 } else {}
@@ -267,12 +267,9 @@ export default {
                 name: _this.GmSearch.name,
                 status: _this.GmSearch.status
             }).then((res) => {
-                _this.goodsList = res.data.data.rows
                 _this.loading = !_this.loading
+                _this.goodsList = res.data.data.rows
             })
-        },
-        handleStatus(status) {
-           return status === 1 ? '正常' : '已下架'
         },
         handleUp(row) {
             return row.status = row.status === 0 ? 1 : 0;

@@ -3,14 +3,17 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
       <el-form :inline="true" :model="buildingStatus" class="demo-form-inline">
-        <el-form-item label>
+        <el-form-item label="" prop="name">
           <el-input v-model="buildingStatus.name" placeholder="楼栋名"></el-input>
         </el-form-item>
-        <el-form-item label>
-          <el-select v-model="buildingStatus.status" placeholder="选择楼栋状态">
-            <el-option label="正常" value="1"></el-option>
-            <el-option label="停营" value="2"></el-option>
-          </el-select>
+        <el-form-item label="" prop="status">
+            <el-select v-model="buildingStatus.status" placeholder="选择商品状态">
+                <el-option 
+                    v-for="(item, index) in buildStatus"
+                    :key="index"
+                    :label="item.name"
+                    :value="item.id"></el-option>
+            </el-select>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
@@ -91,9 +94,12 @@
 import util from "../../../common/js/util";
 //获取楼栋接口
 import { searchBuilding, addBuilding, changeBuilding, deleteBuilding } from "../../../api/building_repository";
+// 获得楼栋类的字典表数据
+import { getDictorys } from '../../../api/dictorys/dictorys.js'
 export default {
   data() {
     return {
+      buildStatus: [],//楼栋状态
       // 控制表单载入状态
       loading: false,
       id: '',
@@ -156,11 +162,15 @@ export default {
     let _this = this;
     _this.loading = !_this.loading
     searchBuilding(_this).then((res) => {
+      _this.buildingList = res.data.data.rows
       _this.loading = !_this.loading
-      _this.BuildingList = res.data.data.rows
     }).catch((err) => {
 
     });
+    // 获取商品状态字典表
+    getDictorys(_this, 1).then((res) => {
+      _this.buildStatus = res.data.data
+  })
   },
   methods: {
     // 处理楼栋运营状态
@@ -176,9 +186,6 @@ export default {
         searchBuilding(_this);
       })
     },
-    selsChange() {},
-    //
-    forStatus() {},
     // 处理查询
     handleSearch() {
       let _this = this
@@ -190,7 +197,7 @@ export default {
         _this.loading = !_this.loading
         _this.buildingList = res.data.data.rows
       }).catch((err) => {
-        console.log(err)
+
       });
     },
     // 新增楼栋按钮
