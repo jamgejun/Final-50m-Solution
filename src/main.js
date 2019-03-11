@@ -41,7 +41,7 @@ axios.defaults.withCredentials = true;
 
 // // 全局默认设置
 // // 超时时间
-// axios.defaults.timeout = 5000;
+axios.defaults.timeout = 10000;
 
 axios.interceptors.response.use((response) => {
     return response

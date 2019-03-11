@@ -1,13 +1,23 @@
 import axios from 'axios'
 
+// 获得楼栋类的字典表数据
+export const getStatus = (ev, id) => {
+    return ev.$ajax.get(`/dictorys?pId=${id}`,{ }, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    })
+}
+
 // 查询楼栋接口
-export const searchBuilding = (ev) => { 
-    return ev.$ajax.get(`/api/apartments?name=${ev.buildingStatus.name}`).then((res) => {
-        console.log(res)
-        ev.buildingList = res.data.data.rows
-      }).catch((err) => {
-        console.log(err)
-      });
+export const searchBuilding = (ev, data) => { 
+    return ev.$ajax.get(`/api/apartments`,{
+        params: data
+     },  {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    })
 }
 
 // 新增楼栋接口
