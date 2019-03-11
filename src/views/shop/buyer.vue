@@ -25,7 +25,7 @@
                 </el-form-item>
             </el-form>
         </el-col>
-        <el-table :data="buyerList" :default-sort="sortObj">
+        <el-table :data="buyerList" :default-sort="sortObj" v-loading = "loading" >
             <el-table-column prop="name" label="昵称"></el-table-column>
             <el-table-column prop="realName" label="真实姓名"></el-table-column>
             <el-table-column prop="phone" label="手机号"></el-table-column>
@@ -51,40 +51,39 @@ export default {
                 phone: '',
                 createTime: ''
             },
-            buyerList: []
+            buyerList: [],
+            buyerList2: []
         }
     },
     mounted: function () {
         let _this = this
-        _this.loading = !_this.loading
-        referBuyer(_this).then((res) => {
-            _this.buyerList = res.data.data.rows
-            searchBuyer(_this).then((res) => {
-                _this.buyerList = buyerList
+        _this.loading = true
+            referBuyer(_this).then((res) => {
+                _this.buyerList = res.data.data.rows
+                _this.loading = false
             }).catch((err) => {
                 console.log(err)
             });  
-        })
     },
     methods: {
         //处理查询
         handleSearch() {
             let _this = this
-            _this.loading = !_this.loading
+            _this.loading = true
             referBuyer(_this).then((res) => {
-                _this.buyerList = res.data.data.rows
+                let buyerList = res.data.data.rows
                 searchBuyer(_this,{
                     name:_this.buyerSearch.name,
                     realName:_this.buyerSearch.realName,
                     phone:_this.buyerSearch.phone,
-                    createStartTime:_this.buyerSearch.createTime[0],
-                    createEndTime: _this.buyerSearch.createTime[1]
-                })
-            }).then((res) => {
-                _this.buyerList = res.data.data.rows
-            }).catch((err) => {
+                    createTime:_this.buyerSearch.createTime
+                }).then((res) => {
+                _this.buyerList = buyerList
+                _this.loading = false
+                }).catch((err) => {
                 console.log(err)
-            });
+            })
+            })
         }
     }
 }

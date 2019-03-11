@@ -2,8 +2,27 @@
     <section>
         <el-col :span="24" class="toolbar">
             <el-form :inline="true" :model="Employsearch" class="demo-form-inline">
-                <el-form-item prop="name">
-                    <el-input v-model="Employsearch.name" placeholder="请输入员工账号名"></el-input>
+                <el-form-item prop="realName" label="真实姓名">
+                    <el-input v-model="Employsearch.realName" placeholder="请输入员工真实姓名"></el-input>
+                </el-form-item>
+                <el-form-item prop="phone" label="手机号">
+                    <el-input v-model="Employsearch.phone" placeholder="请输入员工手机号"></el-input>
+                </el-form-item>
+                <el-form-item prop="createStartTime" label="注册时间">
+                    <el-date-picker
+                        v-model="Employsearch.createStartTime"
+                        type="date"
+                        :picker-options="pickerOptions"
+                        placeholder="请选择起始注册时间">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item prop="createEndTime" label="至">
+                    <el-date-picker
+                        v-model="Employsearch.createEndTime"
+                        type="date"
+                        :picker-options="pickerOptions"
+                        placeholder="请选择最后注册时间">
+                    </el-date-picker>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="handleSeach">查询</el-button>
@@ -16,12 +35,14 @@
         <el-table :data="employList">
             <el-table-column type="selection" label=""></el-table-column>
             <el-table-column prop="name" label="账号名"></el-table-column>
-            <el-table-column prop="accountType" label="账号类型">
+            <el-table-column prop="realName" label="真实姓名"></el-table-column>
+            <el-table-column prop="type" label="账号类型">
                 <template slot-scope="scope">
-                    {{ handleAccountType(scope.row.accountType) }}
+                    {{ handleAccountType(scope.row.type) }}
                 </template>
             </el-table-column>
-            <el-table-column prop="Time" label="创建时间"></el-table-column>
+            <el-table-column prop="phone" label="手机号"></el-table-column>
+            <el-table-column prop="createTime" label="创建时间"></el-table-column>
             <el-table-column label="操作" align="left">
                 <template slot-scope="scope">
                     <el-button size="small" type="primary"  @click="handleChange(scope.$index, scope.row)">重置密码</el-button>
@@ -34,7 +55,7 @@
         <el-dialog :visible.sync="sElock.add">
             <el-form :data="addForm" :rules="FormRules" ref="addForm" :inline="true">
                 <el-form-item prop="name" label="账号名">
-                    <el-input placeholder="请输入账号名" v-model="addForm.name"></el-input>
+                    <el-input placeholder="请输入账号名" v-model="addForm.name" left></el-input>
                 </el-form-item>
                 <el-form-item prop="userType" label="选择账号类型">
                     <el-select v-model="addForm.accountType" placeholder="选择账号类型">
@@ -100,7 +121,7 @@ export default {
             },
             addForm: {
                 name: '',
-                userType: '',
+                type: '',
                 password: '',
                 checkPassword: '',
                 repository: '',
@@ -108,7 +129,7 @@ export default {
             },
             changeForm: {
                 name: '',
-                accountType: '',
+                type: '',
                 password: '',
                 checkPassword: '',
                 repository: '',
@@ -120,46 +141,45 @@ export default {
             employList: [],
             repositoryList : [],
             Employsearch: {
-                name: '',
+                realName: '',
+                phone: '',
+                createStartTime: '',
+                createEndTime: '',
             }
         }
     },
     mounted: function () {
         let _this = this
         referEmploy(_this).then((res) => {
-            let employList = res.data.data.rows
             _this.employList = res.data.data.rows
-            searchEmploy(_this).then((res) => {
-                    _this.employList = employList
             }).catch((err) => {
                 console.log(err)
             });  
-        })
     },
     methods: {
         handleSeach() {
-            let _this=this
-            referEmploy(_this).then((res) => {
-                let employList = res.data.data.rows
-                this.employList = res.data.data.rows
+            let _this = this
                 searchEmploy(_this,{
-                    name:_this.Employsearch.name
-                })
-            }).then((res) => {
-                console.log(res)
+                    realName:_this.Employsearch.realName,
+                    phone:_this.Employsearch.phone,
+                    createStartTime:_this.Employsearch.createStartTime,
+                    createEndTime:_this.Employsearch.createEndTime
+                }).then((res) => {
                 _this.employList = res.data.data.rows
-            }).catch((err) => {
-                console.log(res)
-            })
+                }).catch((err) => {
+                console.log(err)
+                })
         },
         handleChange(index, row) {
             let _this = this;
             _this.sElock.reset = !_this.sElock.reset;
         },
         handleDel() {},
-        handleAccountType(accountType) {
+
+        //处理账户类型
+        handleAccountType(type) {
             let _this = this;
-            return accountType === 0 ? '仓库管理员' : '' ;
+            return type === 32 ? '仓库管理员' : '' ;
         },
         handleAdd() {
             let _this = this;
