@@ -12,7 +12,6 @@
                     <el-date-picker
                         v-model="Employsearch.createStartTime"
                         type="date"
-                        :picker-options="pickerOptions"
                         placeholder="请选择起始注册时间">
                     </el-date-picker>
                 </el-form-item>
@@ -20,7 +19,6 @@
                     <el-date-picker
                         v-model="Employsearch.createEndTime"
                         type="date"
-                        :picker-options="pickerOptions"
                         placeholder="请选择最后注册时间">
                     </el-date-picker>
                 </el-form-item>
@@ -32,7 +30,7 @@
                 </el-form-item> 
             </el-form>
         </el-col>
-        <el-table :data="employList">
+        <el-table :data="employList" v-loading = "loading">
             <el-table-column type="selection" label=""></el-table-column>
             <el-table-column prop="name" label="账号名"></el-table-column>
             <el-table-column prop="realName" label="真实姓名"></el-table-column>
@@ -46,7 +44,7 @@
             <el-table-column label="操作" align="left">
                 <template slot-scope="scope">
                     <el-button size="small" type="primary"  @click="handleChange(scope.$index, scope.row)">重置密码</el-button>
-                    <el-button size="small" type="danger"  @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                    <el-button size="small" type="danger"  @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -115,6 +113,7 @@ import { valid } from 'semver';
 export default {
     data() {
         return {
+            loading: false,
             sElock: {
                 add: false,
                 reset: false
@@ -144,14 +143,16 @@ export default {
                 realName: '',
                 phone: '',
                 createStartTime: '',
-                createEndTime: '',
+                createEndTime: ''
             }
         }
     },
     mounted: function () {
         let _this = this
-        referEmploy(_this).then((res) => {
+        _this.loading = true
+        searchEmploy(_this).then((res) => {
             _this.employList = res.data.data.rows
+            _this.loading = false
             }).catch((err) => {
                 console.log(err)
             });  
@@ -159,22 +160,26 @@ export default {
     methods: {
         handleSeach() {
             let _this = this
-                searchEmploy(_this,{
-                    realName:_this.Employsearch.realName,
-                    phone:_this.Employsearch.phone,
-                    createStartTime:_this.Employsearch.createStartTime,
-                    createEndTime:_this.Employsearch.createEndTime
-                }).then((res) => {
-                _this.employList = res.data.data.rows
-                }).catch((err) => {
-                console.log(err)
-                })
+            _this.loading = true
+            searchEmploy(_this,{
+                realName:_this.Employsearch.realName,
+                phone:_this.Employsearch.phone,
+                createStartTime:_this.Employsearch.createStartTime,
+                createEndTime:_this.Employsearch.createEndTime
+            }).then((res) => {
+            _this.employList = res.data.data.rows
+            _this.loading = false
+            }).catch((err) => {
+            console.log(err)
+            })
         },
         handleChange(index, row) {
             let _this = this;
             _this.sElock.reset = !_this.sElock.reset;
         },
-        handleDel() {},
+
+        //处理员工删除
+        handleDelete() {},
 
         //处理账户类型
         handleAccountType(type) {
