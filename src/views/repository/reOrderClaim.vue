@@ -27,10 +27,7 @@
           <el-table-column prop="ordersNumber" label="待认领订单总数"></el-table-column> 
           <el-table-column label="操作" min-width="100">
             <template slot-scope="scope">
-              <el-button
-                size="small" 
-                type="primary" 
-                @click="handleView(scope.$index, scope.row)" >查看订单详情</el-button>
+              <el-button size="small" type="primary" @click="handleView(scope.$index, scope.row)" >查看订单详情</el-button>
               <el-button type="danger" size="small">更换骑手</el-button>
             </template> 
           </el-table-column> 

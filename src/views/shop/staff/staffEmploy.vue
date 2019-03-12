@@ -179,7 +179,28 @@ export default {
         },
 
         //处理员工删除
-        handleDelete() {},
+        handleDelete() {
+            let _this = this;
+            _this.$confirm('是否删除该商品？删除后不可恢复！', '提示', {
+                type: 'warning'
+            }).then(() => {
+                let oneIds = []
+                oneIds.push(row.id) 
+                deleteGoods(_this, {
+                    ids: oneIds
+                }).then((res) => {
+                    _this.$message({
+                        message: '删除成功',
+                        type: 'success'
+                    })
+                    _this.loading = true
+                    getGoods(_this).then((res) => {
+                        _this.goodsList = res.data.data.rows
+                        _this.loading = false
+                    })
+                })
+            }).catch(() => {})
+        },
 
         //处理账户类型
         handleAccountType(type) {
