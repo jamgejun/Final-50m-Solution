@@ -99,7 +99,6 @@ let routes = [
         component: Home,
         name: '店铺打烊',
         level: 1,
-        leaf: true,//只有一个节点
         iconCls: 'fa fa-bar-chart',
         children: [
             { 
