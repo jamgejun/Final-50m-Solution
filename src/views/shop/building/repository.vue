@@ -5,11 +5,14 @@
         <el-form-item label>
           <el-input v-model="RpSearch.name" placeholder="仓库名"></el-input>
         </el-form-item>
-        <el-form-item label>
-          <el-select v-model="RpSearch.status" placeholder="选择仓库状态">
-            <el-option label="正常" value="1"></el-option>
-            <el-option label="停营" value="2"></el-option>
-          </el-select>
+        <el-form-item label="楼栋状态：  " prop="status">
+            <el-select v-model="RpSearch.status" placeholder="选择楼栋运营状态">
+                <el-option 
+                    v-for="(item, index) in storeStatus"
+                    :key="index"
+                    :label="item.name"
+                    :value="item.id"></el-option>
+            </el-select>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
@@ -118,10 +121,12 @@
 import util from "../../../common/js/util";
 //获取仓库接口
 import { getRepository, addRepository, refreshRepository, deleteRepository } from "../../../api/building_repository";
-
+// 获得仓库类的字典表数据
+import { getDictorys } from '../../../api/dictorys/dictorys.js'
 export default {
   data() {
     return {
+      storeStatus: [],
       loading: false,
       // 模态框开关
       SwitchLock: {
@@ -170,10 +175,15 @@ export default {
   let _this = this;
   _this.loading = !_this.loading
     getRepository(_this).then((res) => {
+      _this.RpList = res.data.data.rows
       _this.loading = !_this.loading
     }).catch((err) => {
 
     });
+    // 获取仓库状态字典表
+    getDictorys(_this, 1).then((res) => {
+      _this.storeStatus = res.data.data
+  })
   },
   methods: {
     // 搜索工具栏
@@ -182,8 +192,12 @@ export default {
     handleSearch() {
       let _this = this;
       _this.loading = !_this.loading
-      getRepository(_this).then((res) => {
+      getRepository(_this, {
+        name:_this.RpSearch.name,
+        status:_this.RpSearch.status
+      }).then((res) => {
       _this.loading = !_this.loading
+      _this.RpList = res.data.data.rows
     }).catch((err) => {
       
     });
@@ -193,15 +207,6 @@ export default {
       let _this = this;
       _this.SwitchLock.addStatus = true;
     },
-    mounted: function () {
-    let _this = this;
-      getRepository(_this).then((res) => {
-        console.log(res)
-        _this.RpList = res.data.data.rows
-      }).catch((err) => {
-        console.log(err)
-      });
-   },
     //新增仓库提交后的按钮
     addSubmit() {
       let _this = this;

@@ -1,13 +1,5 @@
 import axios from 'axios'
 
-// 获得楼栋类的字典表数据
-export const getStatus = (ev, id) => {
-    return ev.$ajax.get(`/dictorys?pId=${id}`,{ }, {
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    })
-}
 
 // 查询楼栋接口
 export const searchBuilding = (ev, data) => { 
@@ -41,13 +33,15 @@ export const deleteBuilding = (ev, id) => {
 
 
 // 查询商铺的仓库接口
-export const getRepository = (ev) => {
-    return ev.$ajax.get(`/api/storages?name=${ev.RpSearch.name}`).then((res) => {
-        console.log(res)
-        ev.RpList = res.data.data.rows
-    }).catch((err) => {
-        console.log(err)
-    });
+export const getRepository = (ev, data) => {
+    return ev.$ajax.get(`/api/storages`, {
+        params: data
+    }, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    }
+    )
 }
 
 // 新增仓库信息接口

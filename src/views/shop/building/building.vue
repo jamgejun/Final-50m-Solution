@@ -3,11 +3,30 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
       <el-form :inline="true" :model="buildingStatus" class="demo-form-inline">
-        <el-form-item label="" prop="name">
-          <el-input v-model="buildingStatus.name" placeholder="楼栋名"></el-input>
+        <el-form-item label="商铺名:  " prop="shopId">
+          <el-select v-model="buildingStatus.shopId" placeholder="">
+            <el-option 
+                    v-for="(item, index) in shop"
+                    :key="index"
+                    :label="item.name"
+                    :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="" prop="status">
-            <el-select v-model="buildingStatus.status" placeholder="选择商品状态">
+        <el-form-item label="仓库名:  " prop="storageId">
+          <el-select v-model="buildingStatus.storageId" placeholder="">
+            <el-option 
+                    v-for="(item, index) in storage"
+                    :key="index" 
+                    :label="item.name"
+                    :value="item.id"></el-option>
+          </el-select>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="楼栋名:  " prop="name">
+          <el-input v-model="buildingStatus.name" placeholder=""></el-input>
+        </el-form-item>
+        <el-form-item label="楼栋状态：  " prop="status">
+            <el-select v-model="buildingStatus.status" placeholder="选择楼栋运营状态">
                 <el-option 
                     v-for="(item, index) in buildStatus"
                     :key="index"
@@ -29,7 +48,6 @@
       :data="buildingList"
       highlight-current-row
       v-loading="loading"
-      @selection-change="selsChange"
       style="width: 100%;"
     >
       <el-table-column type="selection" width="55"></el-table-column>
@@ -57,10 +75,13 @@
           <el-input v-model="addForm.name" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="运营状态" prop="status">
-          <el-radio-group v-model="addForm.status">
-            <el-radio :label="1">正常</el-radio>
-            <el-radio :label="2">停营</el-radio>
-          </el-radio-group>
+          <el-select v-model="addForm.status">
+              <el-option 
+                  v-for="(item, index) in buildStatus"
+                  :key="index"
+                  :label="item.name"
+                  :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="详细信息" prop="info">
           <el-input type="textarea" v-model="addForm.info"></el-input>
@@ -94,15 +115,22 @@
 import util from "../../../common/js/util";
 //获取楼栋接口
 import { searchBuilding, addBuilding, changeBuilding, deleteBuilding } from "../../../api/building_repository";
+//获取商铺接口
+import { searchClose } from "../../../api/close"
+//获取仓库接口
+import { getRepository } from "../../../api/building_repository"
 // 获得楼栋类的字典表数据
 import { getDictorys } from '../../../api/dictorys/dictorys.js'
 export default {
   data() {
     return {
-      buildStatus: [],//楼栋状态
+      buildStatus: [],
+      shop: [],
+      storage: [],
       // 控制表单载入状态
       loading: false,
       id: '',
+      userId: '',
       // 模态框控制
       GcLock: {
         change: false
@@ -136,6 +164,8 @@ export default {
       // 查看详情
       // 选择楼栋状态
       buildingStatus: {
+        shopId: "",
+        storageId: "",
         name: "",
         status: ""
       },
@@ -170,7 +200,54 @@ export default {
     // 获取商品状态字典表
     getDictorys(_this, 1).then((res) => {
       _this.buildStatus = res.data.data
-  })
+    });
+    //获取商铺接口
+    searchClose(_this).then((res) => {
+      _this.shop = res.data.data.rows
+      _this.shop.unshift({
+          id: '',
+          name: '不限'
+        })
+    });
+    //获取仓库接口
+    getRepository(_this).then((res) => {
+      _this.storage = res.data.data.rows
+      _this.storage.unshift({
+          id: '',
+          name: '不限'
+        })
+    })
+  },
+  watch: {
+      shopId() {
+        let _this = this
+        //获取仓库接口
+        _this.storage = []
+        getRepository(_this, {
+          shopId:_this.shopId
+        }).then((res) => {
+          _this.storage = res.data.data.rows
+          if(res.data.data.rows.length == 0 && _this.shopId != '') {
+            _this.storage.unshift({
+              id: '',
+              name: '该商铺暂无仓库'
+            })
+            _this.buildingStatus.storageId = '该商铺暂无仓库'
+          } else {
+            _this.storage.unshift({
+              id: '',
+              name: '不限'
+            })
+            _this.buildingStatus.storageId = _this.storage[0].name
+          }
+        })
+      }
+  },
+  computed: {
+    shopId() {
+      let _this = this
+      return _this.buildingStatus.shopId
+    }
   },
   methods: {
     // 处理楼栋运营状态
@@ -180,19 +257,23 @@ export default {
         status: row.status === 1 ? 2 : 1
       }).then((res) => {
         _this.$message({
-            message: "操作成功",
-            type: "success"
+          message: "操作成功",
+          type: "success"
         });
-        searchBuilding(_this);
+        searchBuilding(_this).then((res) => {
+          _this.buildingList = res.data.data.rows
+        });
       })
     },
     // 处理查询
     handleSearch() {
       let _this = this
       _this.loading = !_this.loading
-      searchBuilding(_this,{
+      searchBuilding(_this, {
         name:_this.buildingStatus.name,
-        status:_this.buildingStatus.status
+        status:_this.buildingStatus.status,
+        shopId:_this.buildingStatus.shopId,
+        storageId:_this.buildingStatus.storageId
       }).then((res) => {
         _this.loading = !_this.loading
         _this.buildingList = res.data.data.rows
@@ -260,7 +341,9 @@ export default {
             type: "success"
         });
         _this.GcLock.change = !_this.GcLock.change;
-        searchBuilding(_this);
+        searchBuilding(_this).then((res) => {
+          _this.bulidingList = res.data.data.rows
+        });
       })
     },
     //删除
