@@ -1,19 +1,21 @@
 <template>
     <section>
-        <el-table :data="myShop">
-            <el-table-column prop="name" label="店铺名"></el-table-column>
-            <el-table-column prop="status" label="店铺状态">
+        <el-table :data="shopList" :default-sort="sortObj" v-loading = "loading">
+            <el-table-column prop="name" label="商铺名"></el-table-column>
+            <el-table-column prop="status" label="商铺状态">
                 <template slot-scope="scope">
                     {{ handleStatus(scope.row.status) }}
                 </template>
             </el-table-column>
-            <el-table-column prop="startTime" label="打烊开始时间"></el-table-column>
-            <el-table-column prop="endTime" label="打烊结束时间"></el-table-column>
+            <el-table-column prop="userName" label="商铺管理员"></el-table-column>
+            <el-table-column prop="info" label="商铺信息"></el-table-column>
+            <el-table-column prop="fromTime" label="打烊起始时间"></el-table-column>
+            <el-table-column prop="toTime" label="打烊截至时间"></el-table-column>
             <el-table-column label="操作" width="280">
                 <template slot-scope="scope">
-                    <el-button type="primary" v-if="!scope.row.status" size="small" @click.native.prevent="reStart(scope.row)">恢复运营</el-button>
-                    <el-button type="warning" size="small" @click.native.prevent="handleSmallTimeClose(scope.row)">临时打烊</el-button>
-                    <el-button type="danger" size="small" @click.native.prevent="handleAllTimeClose(scope.row)">长期打烊</el-button>
+                    <el-button type="primary" v-if="scope.row.status === 1 ? false : true" size="small" @click.native.prevent="reStart(scope.row)">恢复运营</el-button>
+                    <el-button type="warning" v-if="scope.row.status === 1 ? true : false" size="small" @click.native.prevent="handleSmallTimeClose(scope.row)">临时打烊</el-button>
+                    <el-button type="danger" v-if="scope.row.status === 1 ? true : false" size="small" @click.native.prevent="handleAllTimeClose(scope.row)">长期打烊</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -74,6 +76,7 @@
 </template>
 
 <script>
+import { searchClose } from "../../api/close";
 export default {
     data() {
         return {
@@ -81,23 +84,28 @@ export default {
                 smallTime: false,
                 allTime: false
             },
-            myShop: [
-                {
-                    name: '重邮商铺',
-                    status: 0,
-                    startTime: '2019-2-20',
-                    endTime: '2019-3-1'
-                }
-            ],
+            shopList: [],
             closeForm: {
                 startTime: '',
                 endTime: ''
             }
         }
     },
+    //遍历所有商铺
+    mounted: function () {
+        let _this = this
+        _this.loading = true
+            searchClose(_this).then((res) => {
+                _this.shopList = res.data.data.rows
+                _this.loading = false
+            }).catch((err) => {
+                console.log(err)
+            });  
+    },
     methods: {
+        //判断运营状态
         handleStatus(status) {
-            return status === 0 ?  "打烊中" : "运营中"
+            return status === 1 ?  "运营中" : "打烊中"
         },
         handleSmallTimeClose() {
             let _this = this;
