@@ -65,17 +65,17 @@
             <el-form-item label="商品更多" prop="moreInfo">
                 <el-input type="textarea" class="noResize-form" v-model="changeForm.moreInfo" auto-complete="off"></el-input>
             </el-form-item>
-            <el-form-item label="已有图片" v-show="changeFormgoodsOtherPic.length">
+            <el-form-item label="已有图片" v-show="changeFormPic.length">
                 <ul class="el-upload-list el-upload-list--picture-card changePicture">
                     <li 
                     class="el-upload-list__item is-ready" 
-                    v-for="(item,index) in changeFormgoodsOtherPic"
-                    :key='item'>
-                        <img :src="item" alt="" class="el-upload-list__item-thumbnail">
+                    v-for="(item,index) in changeFormPic"
+                    :key='index'>
+                        <img :src="item.pictureUrl" alt="" class="el-upload-list__item-thumbnail">
                         <a class="el-upload-list__item-name"></a>
                         <i class="el-icon-close"></i><!---->
                         <span class="el-upload-list__item-actions"><!---->
-                            <span class="el-upload-list__item-delete"><i class="el-icon-delete2" @click="deleteImg(index)"></i></span>
+                            <span class="el-upload-list__item-delete"><i class="el-icon-delete2" @click="deleteImg(item)"></i></span>
                         </span>
                     </li>
                 </ul>
@@ -112,7 +112,11 @@ export default {
         changeForm: {
             type: Object,
             required: true
-        }
+        },
+        changeFormPic: {
+            type: Array,
+            required: true
+        }, // 本地测试的删除图片信息
     },
     mounted: function () {
         let _this = this;
@@ -150,18 +154,6 @@ export default {
         }
     },
     data() {
-        // 检查商品原价
-        var originalPrice = (rule, value, callback) => {
-            let Price = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/
-            if (!Price.test(value) && value!='') {
-                console.log('aa')
-                callback(new Error('请检查正确的商品格式！例如2.00'))
-            } else if(value.length>64){
-                callback(new Error('商品价格不能超过64位！'))
-            } else {
-                callback()
-            }
-        }
         // 检查商品卖价
         var checkPirce = (rule, value, callback) => {
             let _this = this;
@@ -235,7 +227,6 @@ export default {
             isChanged:false,
             dialogImageUrl: '',
             dialogVisible: false,
-            changeFormgoodsOtherPic: ['http://jwzx.cqu.pt/images/book2.jpg'], // 本地测试的删除图片信息
             PhotoList: [],
             formRules: {
                 name: [
@@ -246,7 +237,7 @@ export default {
                     { max: 20, message: '商品条码不能超过20位', trigger: 'blur change'}
                 ],
                 originalPrice: [
-                    { validator: originalPrice,  trigger: 'blur change' }
+                    { type:number, required: false, message: '请填入有效信息', trigger: 'blur' },
                 ],
                 sellPrice: [
                     { validator: checkPirce, trigger: 'blur change' }
@@ -293,23 +284,26 @@ export default {
 
         },
         // 处理图片删除时的方法
-        deleteImg(index) {
+        deleteImg(item) {
             let _this = this;
             _this.$confirm('是否删除该图片？', '提示', {
                 type: 'warning'
             }).then(() => {
                 // 调用接口，删除图片
                 updatePicture(_this, {
-                    id: _this.changeForm.goodsOtherPic.id, // 传入删除图片的id
-                    goodsId: _this.changeForm.id, // 传入删除图片的商品id
+                    id: item.id, // 传入删除图片的id
                 }).then((res) => {
                     // 删除成功后
                     _this.$message({
                         message: '删除成功！',
                         type: 'success'
                     }).then(() => {
-                        // 更新显示视图
-                        _this.changeForm.goodsOtherPic.splice(index, 1)
+                        // 更新显示视图 传入视图
+                        getOneGoodsPic(_this, {
+                            goodsId: item.goodsId
+                        }).then((res) => {
+                            _this.changeFormPic = res.data.data.rows
+                        }).catch(() => {})
                     })
                 })
             }).catch(() => {})
@@ -358,7 +352,7 @@ export default {
                                     formData.append('newPic', _this.PhotoList[i]) //存入图片
                                 }
                                 formData.append('flag', '0') // 是否默认
-                                updatePicture(_this, formData).then(() => {
+                                updatePicture(_this, formData).then((res) => {
                                     _this.$message({
                                         message: '更新成功！',
                                         type: 'success'

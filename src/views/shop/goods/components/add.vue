@@ -123,17 +123,22 @@ export default {
         })
     },
     watch: {
-        addForm(newValue, oldValue) {
+        typeId(newValue, oldValue) {
             let _this = this;
-            if(oldValue.typeId != newValue.typeId) {
-                // 获取二级分类
-                getGoodsTypes(_this, {
-                    parentId: _this.addForm.typeId
-                }).then((res) => {
-                    constants.log(res)
-                    _this.goodsCategoryTwo = res.data.data.rows
-                })
-            } else {}
+            // 获取二级分类
+            _this.addForm.typeIds = ''
+            _this.goodsCategoryTwo = []
+            getGoodsTypes(_this, {
+                parentId: newValue
+            }).then((res) => {
+                _this.goodsCategoryTwo = res.data.data.rows
+            })
+        }
+    },
+    computed: {
+        typeId() {
+            let _this = this;
+            return _this.addForm.typeId
         }
     },
     data() {
@@ -330,7 +335,11 @@ export default {
                             formData.append('originalPrice', _this.addForm.originalPrice)
                             formData.append('info', _this.addForm.info)
                             formData.append('unit', _this.addForm.unit)
-                            formData.append('typeId', _this.addForm.typeId)
+                            if (_this.addForm.typeIds != '') {
+                                formData.append('typeId', _this.addForm.typeIds)
+                            } else {
+                                formData.append('typeId', _this.addForm.typeId)
+                            }
                             formData.append('moreInfo', _this.addForm.moreInfo)
                             formData.append('displayIndex', _this.addForm.displayIndex)
                             formData.append('isHot', _this.addForm.isHot)

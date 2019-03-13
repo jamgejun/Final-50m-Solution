@@ -92,7 +92,7 @@
 
         <!-- 修改 -->
         <el-dialog title="修改商品" :visible.sync="GmLock.change" :close-on-click-model="false" >
-            <change-form :changeForm="changeForm" @changeFormclose='changeFormclose'></change-form>
+            <change-form :changeForm="changeForm" :changeFormPic="changeFormPic" @changeFormclose='changeFormclose'></change-form>
         </el-dialog>
 
         <!-- 补货/调价商品 -->
@@ -117,7 +117,7 @@
 </template>
 
 <script>
-import { getGoods, getOneGoods, deleteGoods, updateGoods } from '../../../api/goods/goods.js'
+import { getGoods, getOneGoods, getOneGoodsPic, deleteGoods, updateGoods } from '../../../api/goods/goods.js'
 import { getDictorys } from '../../../api/dictorys/dictorys.js'
 import { getGoodsTypes } from '../../../api/goods/category.js'
 import addForm from './components/add.vue'
@@ -185,6 +185,7 @@ export default {
                 status: ''
             },
             changeForm: {},
+            changeFormPic: [], // 商品图片的数组
             goodsList: [
                 {
                     id: '商品ID',
@@ -307,9 +308,15 @@ export default {
             let _this = this;
             _this.GmLock.change = !_this.GmLock.change;
             _this.changeForm = {}
+            // 获取商品的信息，以及图片
             getOneGoods(_this, row.id).then((res) => {
                 _this.changeForm = res.data.data
-            })
+                getOneGoodsPic(_this, {
+                    goodsId: row.id
+                }).then((res) => {
+                    _this.changeFormPic = res.data.data.rows
+                }).catch(() => {})
+            }).catch(() => {})
         },
 
         // 修改商品价格

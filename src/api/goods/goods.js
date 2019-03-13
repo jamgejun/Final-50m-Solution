@@ -28,7 +28,16 @@ export const getOneGoods = (ev, id, data) => {
         }
     })
 }
-
+// 获取某个商品的图片
+export const getOneGoodsPic = (ev, data) => {
+    return ev.$ajax.get(`/api/goodspictures`, {
+        params: data
+    },{
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    })
+}
 // 更新商品接口
 export const updateGoods = (ev, id, data) => {
     return ev.$ajax.put(`/api/goodss/${id}`,data, {
@@ -65,9 +74,7 @@ export const deleteGoods = (ev, data) => {
 
 // 更新图片接口
 export const updatePicture = (ev, data) => {
-    return ev.$ajax.put(`/api/goodspictures/`, {
-        data: data
-    }, {
+    return ev.$ajax.put(`/api/goodspictures/`, data, {
         headers: {
             'Content-Type': 'application/json'
         }
