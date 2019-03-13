@@ -117,7 +117,7 @@
 </template>
 
 <script>
-import { getGoods, getOneGoods, deleteGoods } from '../../../api/goods/goods.js'
+import { getGoods, getOneGoods, deleteGoods, updateGoods } from '../../../api/goods/goods.js'
 import { getDictorys } from '../../../api/dictorys/dictorys.js'
 import { getGoodsTypes } from '../../../api/goods/category.js'
 import addForm from './components/add.vue'
@@ -140,7 +140,7 @@ export default {
         getDictorys(_this, 3).then((res) => {
             _this.goodsStatus = res.data.data
             _this.goodsStatus.push({
-                id: 0,
+                id: '',
                 name: '不限'
             })
         })
@@ -150,7 +150,7 @@ export default {
         }).then((res) => {
             _this.goodsCategory = res.data.data.rows
             _this.goodsCategory.push({
-                id: 0,
+                id: '',
                 name: '不限'
             })
         })
@@ -219,6 +219,10 @@ export default {
                     parentId: _this.goodsType
                 }).then((res) => {
                     _this.goodsCategoryTwo = res.data.data.rows
+                    _this.goodsCategoryTwo.push({
+                        id:'',
+                        name: '不限'
+                    })
                 })
             } else {}
         }
@@ -272,7 +276,13 @@ export default {
             })
         },
         handleUp(row) {
-            return row.status = row.status === 0 ? 1 : 0;
+            let _this = this;
+            let goodsId = _this.goodsStatus.find(v => v.id != row.status)
+            updateGoods(_this, row.id, {
+                status: goodsId.id
+            }).then((res) => {
+                console.log(res)
+            })
         },
 
         // 新增商品的显示和隐藏

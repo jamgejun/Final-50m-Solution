@@ -31,7 +31,7 @@ export const getOneGoods = (ev, id, data) => {
 
 // 更新商品接口
 export const updateGoods = (ev, id, data) => {
-    return ev.$ajax.put(`/api/goodss/${id}`, data, {
+    return ev.$ajax.put(`/api/goodss/${id}`,data, {
         headers: {
             'Content-Type': 'application/json'
         }

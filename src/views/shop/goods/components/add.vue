@@ -30,10 +30,20 @@
                         ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="商品分类" prop="typeId" class="inline-form">
-                <el-select v-model="addForm.typeId" placeholder="选择商品分类">
+            <el-form-item label="一级分类" prop="typeId" class="inline-form">
+                <el-select v-model="addForm.typeId" placeholder="选择一级分类">
                     <el-option
                             v-for="(item, index) in goodsCategory"
+                            :key="index"
+                            :label="item.name" 
+                            :value="item.id"
+                        ></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="二级分类" prop="typeIds" class="inline-form">
+                <el-select v-model="addForm.typeIds" placeholder="选择二级分类" :disabled="!Boolean(addForm.typeId)">
+                    <el-option
+                            v-for="(item, index) in goodsCategoryTwo"
                             :key="index"
                             :label="item.name" 
                             :value="item.id"
@@ -93,6 +103,7 @@
 <script>
 import { addGoods } from '../../../../api/goods/goods.js'
 import { getDictorys } from '../../../../api/dictorys/dictorys.js'
+import { getGoodsTypes } from '../../../../api/goods/category.js'
 export default {
     mounted: function (){
         let _this = this;
@@ -105,9 +116,25 @@ export default {
             _this.goodsUnit = res.data.data
         })
         // 获取商品分类
-        getDictorys(_this, 11).then((res) => {
-            _this.goodsCategory = res.data.data
+        getGoodsTypes(_this, {
+            parentId:0
+        }).then((res) => {
+            _this.goodsCategory = res.data.data.rows
         })
+    },
+    watch: {
+        addForm(newValue, oldValue) {
+            let _this = this;
+            if(oldValue.typeId != newValue.typeId) {
+                // 获取二级分类
+                getGoodsTypes(_this, {
+                    parentId: _this.addForm.typeId
+                }).then((res) => {
+                    constants.log(res)
+                    _this.goodsCategoryTwo = res.data.data.rows
+                })
+            } else {}
+        }
     },
     data() {
         // 检查商品原价
@@ -173,6 +200,7 @@ export default {
             goodsStatus: [], // 获取商品的状态
             goodsUnit: [], // 商品的单位
             goodsCategory: [], // 商品的分类
+            goodsCategoryTwo: [],
             goodsDisplayIndex: [// 商品显示顺序
                 {
                     id: 0,
@@ -201,6 +229,7 @@ export default {
                 info: '',
                 unit: '',
                 typeId: '',
+                typeIds: '',
                 moreInfo: '',
                 displayIndex: '',
                 isHot: '',
