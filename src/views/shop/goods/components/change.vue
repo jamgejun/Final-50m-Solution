@@ -286,13 +286,13 @@ export default {
         // 处理图片删除时的方法
         deleteImg(item) {
             let _this = this;
+            let formData = new FormData()
             _this.$confirm('是否删除该图片？', '提示', {
                 type: 'warning'
             }).then(() => {
                 // 调用接口，删除图片
-                updatePicture(_this, {
-                    id: item.id, // 传入删除图片的id
-                }).then((res) => {
+                formData.append('id', item.id)
+                updatePicture(_this, formData).then((res) => {
                     // 删除成功后
                     _this.$message({
                         message: '删除成功！',

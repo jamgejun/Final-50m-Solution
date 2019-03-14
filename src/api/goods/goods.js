@@ -76,7 +76,7 @@ export const deleteGoods = (ev, data) => {
 export const updatePicture = (ev, data) => {
     return ev.$ajax.put(`/api/goodspictures/`, data, {
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json; multipart/form-data'
         }
     })
 }
